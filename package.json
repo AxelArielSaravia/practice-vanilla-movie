@@ -1,0 +1,12 @@
+{
+    "name": "vanilla-movie",
+    "module": "main.js",
+    "devDependencies": {
+        "@types/web": "^0.0.111",
+        "bun-types": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "type": "module"
+}

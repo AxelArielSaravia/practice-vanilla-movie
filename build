@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#This Build use:
+# Bun.js to bundle and minify javascript (https://bun.sh/)
+# tdewolff/minify to minify html, css and json (https://github.com/tdewolff/minify)
+
+dir=./public
+
+media=0
+api=0
+
+if [ "$1" = "media" ]; then
+    media=1
+elif [ "$1" = "api" ]; then
+    api=1
+fi
+if [ "$2" = "media" ]; then
+    media=1
+elif [ "$2" = "api" ]; then
+    api=1
+fi
+
+if [ ! -d $dir ]; then
+    mkdir $dir
+    echo Create $dir
+fi
+
+bun build ./src/main.js --outdir $dir --minify
+echo JS Build main.js Successful
+
+minify -o $dir/index.html ./src/index.html
+echo HTML minified success
+
+minify -o $dir/style.css ./src/style.css
+echo CSS minified success
+
+if [ $media = 1 ]; then
+    cp -dr ./src/media $dir/media
+    echo Copy media
+fi
+
+
+if [ $api = 1 ]; then
+    api_dir="$dir/api"
+    if [ ! -d "$api_dir" ]; then
+        mkdir $api_dir
+        echo Create $api_dir
+    fi
+    minify -o $api_dir/_utils.js    ./api/_utils.js
+    minify -o $api_dir/discover.js  ./api/discover.js
+    minify -o $api_dir/genres.js    ./api/genres.js
+    minify -o $api_dir/images.js    ./api/images.js
+    minify -o $api_dir/popular.js   ./api/popular.js
+    minify -o $api_dir/toprated.js  ./api/toprated.js
+    minify -o $api_dir/trending.js  ./api/trending.js
+    echo API minified success
+fi
