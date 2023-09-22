@@ -60,13 +60,12 @@ const API = {
     @type {(
         id: string,
         type: "movie" | "tv",
-        page: string
     ) => Promise<maybe<MDBImages>>} */
-    getImages(id, type, page = "1") {
+    getImages(id, type) {
         return (
-            fetch(`${window.location.origin}/api/images?type=${type}&id=${id}&page=${page}`)
+            fetch(`${window.location.origin}/api/images?type=${type}&id=${id}`)
             .then(fetchResolve)
-        );
+       );
     },
     /**
     @type {(type: "movie" | "tv") => Promise<maybe<MDBGenres>>} */

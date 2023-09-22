@@ -17,7 +17,7 @@ export default async function handler(req) {
     }
     const r = await fetch(p, _utils.FETCH_OPT);
     if (!r.ok) {
-        return new Response("Bad request", {status: 404});
+        return new Response("Bad request", _utils.RES_BAD_OPT);
     }
     return new Response(r.body, _utils.RES_OPT);
 }

@@ -1,5 +1,5 @@
 import API from "./api.js";
-import {random} from "./utils.js";
+import * as utils from "./utils.js";
 
 const TYPE = {
     /**
@@ -19,6 +19,10 @@ const CollectionState = {
     count: 7,
 };
 
+const MEDIA = {
+    pointerFine: window.matchMedia("(pointer: fine)"),
+}
+
 const Theme = {
     /**
     @type {ThemeColor}*/
@@ -30,7 +34,7 @@ const Theme = {
     @type {"light"}*/
     LIGHT: "light",
     init() {
-        const t = localStorage.getItem("theme");
+        var t = localStorage.getItem("theme");
         if (t === "dark" || t === "light") {
             Theme.current = t;
         } else {
@@ -55,7 +59,7 @@ const Theme = {
     },
     onclick(e) {
         /**@type {HTMLButtonElement | null}*/
-        const DOMThemeButton = e.currentTarget;
+        var DOMThemeButton = e.currentTarget;
         if (DOMThemeButton === null) {
             return;
         }
@@ -79,9 +83,9 @@ const NavMethods = {
     buttonNavOnclick(e) {
         console.info(e);
         /**@type {HTMLButtonElement}*///This will crash if is null
-        const DOMButtonNav = e.currentTarget;
+        var DOMButtonNav = e.currentTarget;
         /**@type {HTMLUListElement}*///This will crash if is null
-        const DOMNav = DOMButtonNav.nextElementSibling;
+        var DOMNav = DOMButtonNav.nextElementSibling;
         if (DOMNav.getAttribute(NavMethods.ATTR_SHOW) === NavMethods.HIDDEN) {
             DOMNav.setAttribute(NavMethods.ATTR_SHOW, NavMethods.SHOW);
             //First nav-link element
@@ -92,13 +96,13 @@ const NavMethods = {
     },
     //hidde nav menu if the focus is out of the nav menu of the 
     navOnfocusout(e) {
-        const relatedTarget = e.relatedTarget;
+        var relatedTarget = e.relatedTarget;
         if (
             relatedTarget === null
             || relatedTarget.getAttribute("data-type") !== TYPE.NAV_LINK
         ) {
             /**@type {HTMLUListElement}*///This will crash if is null
-            const DOMNav = e.currentTarget;
+            var DOMNav = e.currentTarget;
             DOMNav.setAttribute(
                 NavMethods.ATTR_SHOW,
                 NavMethods.HIDDEN
@@ -106,13 +110,13 @@ const NavMethods = {
         }
     },
     navOnclick(e) {
-        const target = e.target;
+        var target = e.target;
         if (target.getAttribute("data-type") === TYPE.NAV_LINK) {
-            const type = target.getAttribute(NavMethods.ATTR_LINK_TYPE);
+            var type = target.getAttribute(NavMethods.ATTR_LINK_TYPE);
             /**@type {HTMLUListElement}*///This will crash if is null
-            const DOMNav = e.currentTarget;
+            var DOMNav = e.currentTarget;
             /**@type {HTMLButtonElement}*///This will crash if is null
-            const DOMButtonNav = DOMNav.previousElementSibling;
+            var DOMButtonNav = DOMNav.previousElementSibling;
             DOMButtonNav.replaceChildren();
             DOMButtonNav.insertAdjacentText("beforeend", target.textContent);
             DOMNav.setAttribute(NavMethods.ATTR_SHOW, NavMethods.HIDDEN);
@@ -126,8 +130,7 @@ const HeroMethods = {
     /**
     @type {(trendings: Array<MDBTrending>) => MDBTrending}*/
     select(trendings) {
-        const n = random(trendings.length);
-        return trendings[n];
+        return trendings[utils.random(trendings.length)];
     },
     //Select a random trending movie or tv serie
     /**
@@ -146,9 +149,9 @@ const HeroMethods = {
         if (hero === undefined) {
             return;
         }
-        const id = hero.id;
-        const mediaType = hero.media_type;
-        let images = await API.getImages(id, mediaType);
+        var id = hero.id;
+        var mediaType = hero.media_type;
+        var images = await API.getImages(id, mediaType);
         //we assume that must exist some logo
         if (images.logos.length > 0) {
             return images.logos[0].file_path;
@@ -160,7 +163,7 @@ const HeroMethods = {
     @type {(path: string, DOMHero: HTMLDivElement) => undefined}*/
     initDOMImgLogo(path, DOMHero) {
         /**@type {HTMLElement}*/
-        const DOMLogo = (
+        var DOMLogo = (
             DOMHero
             .lastElementChild
             .firstElementChild
@@ -179,13 +182,13 @@ const HeroMethods = {
     @type {(hero: HeroItem, DOMHero: HTMLDivElement) => undefined}*/
     initDOM(hero, DOMHero) {
         /**@type {HTMLImageElement}*/
-        const DOMImgBg = DOMHero.firstElementChild.firstElementChild;
+        var DOMImgBg = DOMHero.firstElementChild.firstElementChild;
         /**@type {HTMLElement}*/
-        const DOMInfo = DOMHero.lastElementChild;
+        var DOMInfo = DOMHero.lastElementChild;
         /**@type {HTMLElement}*/
-        const DOMHLogo = DOMInfo.firstElementChild.firstElementChild;
+        var DOMHLogo = DOMInfo.firstElementChild.firstElementChild;
         /**@type {HTMLParamElement}*/
-        const DOMDescription = DOMInfo.children[2];
+        var DOMDescription = DOMInfo.children[2];
 
         DOMImgBg.setAttribute("data-display", "1");
         DOMImgBg.setAttribute(
@@ -246,21 +249,32 @@ const View = {
 @type {(
     data: Promise<maybe<object>>,
     DOMItem: HTMLButtonElement,
-    DOMTIcon: HTMLTemplateElement
+    DOMTIcon: HTMLTemplateElement,
+    backdropAlt: maybe<string>,
 ) => Promise<undefined>}*/
-async function setItemImage(dataP, DOMItem, DOMTIcon) {
-    const data = await dataP;
+async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
+    var data = await dataP;
     if (data === undefined
         || data.backdrops === undefined
         || data.backdrops.length === 0
     ) {
-        DOMItem.firstElementChild.setAttribute("data-display", "1");
-        var DOMIVideo = DOMTIcon.content.firstElementChild?.cloneNode(true);
-        DOMItem.appendChild(DOMIVideo);
+        if (backdropAlt !== undefined && backdropAlt.length > 0) {
+            var DOMImg = DOMItem.lastElementChild;
+            DOMImg.setAttribute(
+                "src",
+                `https://image.tmdb.org/t/p/w400${backdropAlt}`
+            );
+            DOMImg.setAttribute("data-display", "1");
+
+        } else {
+            DOMItem.firstElementChild.setAttribute("data-display", "1");
+            var DOMIVideo = DOMTIcon.content.firstElementChild?.cloneNode(true);
+            DOMItem.appendChild(DOMIVideo);
+        }
     } else {
-        const backdrop = data.backdrops[0];
+        var backdrop = data.backdrops[0];
         /** @type {HTMLImageElement}*/
-        const DOMImg = DOMItem.lastElementChild;
+        var DOMImg = DOMItem.lastElementChild;
         DOMImg.setAttribute(
             "src",
             `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
@@ -287,14 +301,14 @@ function createDOMCollection(
     DOMTIcon
 ) {
     /**@type {HTMLTemplateElement}*/
-    const DOMClone = DOMTCollection.content.cloneNode(true);
+    var DOMClone = DOMTCollection.content.cloneNode(true);
     /**@type {HTMLElement}*/
-    const DOMCollection = DOMClone.firstElementChild;
-//    DOMCollection.children[0].insertAdjacentText("beforeend", header);
-    const DOMTitle = DOMCollection.children[0]
+    var DOMCollection = DOMClone.firstElementChild;
+    //DOMCollection.children[0].insertAdjacentText("beforeend", header);
+    var DOMTitle = DOMCollection.children[0]
     DOMTitle.insertAdjacentText("beforeend", header);
 
-    for (let dataItem of data) {
+    for (var dataItem of data) {
         /**@type {HTMLButtonElement}*/
         const DOMItem = DOMTCollItem.content.cloneNode(true).firstElementChild;
         DOMItem.setAttribute("data-id", dataItem.id);
@@ -317,19 +331,36 @@ function createDOMCollection(
         setItemImage(
             API.getImages(dataItem.id, itemMediaType),
             DOMItem,
-            DOMTIcon
+            DOMTIcon,
+            dataItem.backdrop_path
         );
         DOMCollection.lastElementChild.appendChild(DOMItem);
     }
     return DOMCollection;
 }
 
-const MEDIA = {
-    pointerFine: window.matchMedia("(pointer: fine)"),
+async function discover(DataPromise, title, mediaType, i, DOM) {
+    var data = await DataPromise;
+    console.info(title, data);
+    if (data?.results === undefined || data.results.length === 0) {
+        throw Error("API.getTopRated does not have data");
+    }
+    var DOMColl = createDOMCollection(
+        /*header*/          title,
+        /*data*/            data.results,
+        /*mediaType*/       mediaType,
+        /*DOMTCollection*/  DOM.templateCollection,
+        /*DOMTCollItem*/    DOM.templateCollItem,
+        /*DOMTIcon*/        DOM.templateIcons
+    );
+    var DOMPos = DOM.view.children[5 + i];
+    DOMPos.insertAdjacentElement("beforebegin", DOMColl);
+    DOMPos.remove();
 }
 
+
 window.addEventListener("DOMContentLoaded", function () {
-    const DOM = {
+    var DOM = {
         //template
         templateCollection: document.getElementById("template_collection"),
         templateCollSkeleton: document.getElementById("template_collection-skeleton"),
@@ -396,6 +427,7 @@ window.addEventListener("DOMContentLoaded", function () {
     if(MEDIA.pointerFine.matches) {
         DOM.view.onclick = View.onclick;
     }
+
     MEDIA.pointerFine.onchange = function (e) {
         if(e.matches) {
             DOM.view.onclick = View.onclick;
@@ -404,15 +436,17 @@ window.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    const trendingPromise = API.getTrending("1");
-    trendingPromise.then(console.info);
+    var trendingPromise = API.getTrending("1");
+    trendingPromise.then(function (data) {
+        console.info("trending: ", data);
+    });
 
-    const heroPromise = trendingPromise.then(HeroMethods.selectHero);
-    heroPromise.then(console.info);
+    var heroPromise = trendingPromise.then(HeroMethods.selectHero);
+    heroPromise.then(function (data) {
+        console.info("hero: ", data);
+    });
 
-    heroPromise
-    .then(HeroMethods.getHeroLogo)
-    .then(function (data) {
+    heroPromise.then(HeroMethods.getHeroLogo).then(function (data) {
         if (data !== undefined) {
             HeroMethods.initDOMImgLogo(data, DOM.hero);
         }
@@ -428,15 +462,15 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTrending does not have data");
         }
-        let DOMColl = createDOMCollection(
-            "Week Trendings",
-            data.results,
-            undefined,
-            DOM.templateCollection,
-            DOM.templateCollItem,
-            DOM.templateIcons
+        var DOMColl = createDOMCollection(
+            /*header*/          "Week Trendings",
+            /*data*/            data.results,
+            /*mediaType*/       undefined,
+            /*DOMTCollection*/  DOM.templateCollection,
+            /*DOMTCollItem*/    DOM.templateCollItem,
+            /*DOMTIcon*/        DOM.templateIcons
         );
-        const DOMPos0 = DOM.view.children[0];
+        var DOMPos0 = DOM.view.children[0];
         DOMPos0.insertAdjacentElement("beforebegin", DOMColl);
         DOMPos0.remove();
     });
@@ -446,15 +480,15 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        let DOMColl = createDOMCollection(
-            "Popular Movies",
-            data.results,
-            "movie",
-            DOM.templateCollection,
-            DOM.templateCollItem,
-            DOM.templateIcons
+        var DOMColl = createDOMCollection(
+            /*header*/          "Popular Movies",
+            /*data*/            data.results,
+            /*mediaType*/       "movie",
+            /*DOMTCollection*/  DOM.templateCollection,
+            /*DOMTCollItem*/    DOM.templateCollItem,
+            /*DOMTIcon*/        DOM.templateIcons
         );
-        const DOMPos1 = DOM.view.children[1];
+        var DOMPos1 = DOM.view.children[1];
         DOMPos1.insertAdjacentElement("beforebegin", DOMColl);
         DOMPos1.remove();
     });
@@ -464,15 +498,15 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        let DOMColl = createDOMCollection(
-            "Popular Tv series",
-            data.results,
-            "tv",
-            DOM.templateCollection,
-            DOM.templateCollItem,
-            DOM.templateIcons
+        var DOMColl = createDOMCollection(
+            /*header*/          "Popular Tv series",
+            /*data*/            data.results,
+            /*mediaType*/       "tv",
+            /*DOMTCollection*/  DOM.templateCollection,
+            /*DOMTCollItem*/    DOM.templateCollItem,
+            /*DOMTIcon*/        DOM.templateIcons
         );
-        const DOMPos2 = DOM.view.children[2];
+        var DOMPos2 = DOM.view.children[2];
         DOMPos2.insertAdjacentElement("beforebegin", DOMColl);
         DOMPos2.remove();
     });
@@ -482,15 +516,15 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        let DOMColl = createDOMCollection(
-            "Top rated movie",
-            data.results,
-            "movie",
-            DOM.templateCollection,
-            DOM.templateCollItem,
-            DOM.templateIcons
+        var DOMColl = createDOMCollection(
+            /*header*/          "Top rated movie",
+            /*data*/            data.results,
+            /*mediaType*/       "movie",
+            /*DOMTCollection*/  DOM.templateCollection,
+            /*DOMTCollItem*/    DOM.templateCollItem,
+            /*DOMTIcon*/        DOM.templateIcons
         );
-        const DOMPos3 = DOM.view.children[3];
+        var DOMPos3 = DOM.view.children[3];
         DOMPos3.insertAdjacentElement("beforebegin", DOMColl);
         DOMPos3.remove();
     });
@@ -500,21 +534,21 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        let DOMColl = createDOMCollection(
-            "Top rated tv serie",
-            data.results,
-            "tv",
-            DOM.templateCollection,
-            DOM.templateCollItem,
-            DOM.templateIcons
+        var DOMColl = createDOMCollection(
+            /*header*/          "Top rated tv serie",
+            /*data*/            data.results,
+            /*mediaType*/       "tv",
+            /*DOMTCollection*/  DOM.templateCollection,
+            /*DOMTCollItem*/    DOM.templateCollItem,
+            /*DOMTIcon*/        DOM.templateIcons
         );
-        const DOMPos4 = DOM.view.children[4];
+        var DOMPos4 = DOM.view.children[4];
         DOMPos4.insertAdjacentElement("beforebegin", DOMColl);
         DOMPos4.remove();
     });
 
-    const movieGenreList = API.getGenres("movie");
-    const tvGenreList = API.getGenres("tv");
+    var movieGenreList = API.getGenres("movie");
+    var tvGenreList = API.getGenres("tv");
     Promise.all([movieGenreList,tvGenreList]).then(function (data) {
         console.info("movie genres", data[0]);
         console.info("tv genres", data[1]);
@@ -530,50 +564,44 @@ window.addEventListener("DOMContentLoaded", function () {
         ) {
             throw Error("API.getGenre does not have data");
         }
+        var movieGenres = data[0].genres;
+        var tvGenres = data[1].genres;
+        CollectionState.genresMax = movieGenres.length + tvGenres.length;
 
-        CollectionState.genresMax = data[0].genres.length + data[1].genres.length;
+        if (movieGenres.length > 1) {
+            utils.randomPermutation(movieGenres);
+        }
+        if (tvGenres.length > 1) {
+            utils.randomPermutation(tvGenres)
+        }
 
+        /** @type {"movie" | "tv"}*/
+        var mediaType;
+        /** @type {number}*/
+        var genre;
+        /** @type {string}*/
+        var genreName;
+        /** @type {string}*/
+        var title;
         for (let i = 0; i < 2; i += 1) {
-            /** @type {"movie" | "tv"}*/
-            let mediaType;
-            /** @type {number}*/
-            let genre;
-            /** @type {string}*/
-            let genreName;
-            /** @type {string}*/
-            let title;
             if (Math.random() < 0.5) {
-                let movieGenres = data[0].genres;
-                const rv = Math.floor(Math.random() * movieGenres.length);
-                genre = movieGenres[rv].id;
-                genreName = movieGenres[rv].name;
+                genre = movieGenres[i].id;
+                genreName = movieGenres[i].name;
                 mediaType = "movie";
                 title = `${genreName} Tv series`;
             } else {
-                let tvGenres = data[1].genres;
-                const rv = Math.floor(Math.random() * tvGenres.length); 
-                genre = tvGenres[rv].id;
-                genreName = tvGenres[rv].name;
+                genre = tvGenres[i].id;
+                genreName = tvGenres[i].name;
                 mediaType = "tv";
                 title = `${genreName} Movies`;
             }
-            API.getDiscover(mediaType, genre).then(function (data) {
-                console.info(genre, data);
-                if (data?.results === undefined || data.results.length === 0) {
-                    throw Error("API.getTopRated does not have data");
-                }
-                let DOMColl = createDOMCollection(
-                    title,
-                    data.results,
-                    mediaType,
-                    DOM.templateCollection,
-                    DOM.templateCollItem,
-                    DOM.templateIcons
-                );
-                const DOMPos = DOM.view.children[5 + i];
-                DOMPos.insertAdjacentElement("beforebegin", DOMColl);
-                DOMPos.remove();
-            });
+            discover(
+                API.getDiscover(mediaType, genre, "1"),
+                title,
+                mediaType,
+                i,
+                DOM
+            );
         }
     });
 });

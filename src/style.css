@@ -595,6 +595,9 @@ main .hero-info .hero-description {
 }
 
 :is(.collection,.collection-skeleton) .slider .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     flex-shrink: 0;
     overflow: hidden;
@@ -620,8 +623,9 @@ main .hero-info .hero-description {
 }
 
 .collection .slider .item h3 {
-    padding: 0 1em;
+    position: absolute;
 }
+
 .collection .slider .item img {
     width: 100%;
 }

@@ -6,19 +6,15 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qpage = url.searchParams.get("page");
     var qid = url.searchParams.get("id");
     var qtype = url.searchParams.get("type");
     if (qtype !== "movie" && qtype !== "tv") {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }
-    var p = `${process.env.API_URL}/${qtype}/${qid}/images?include_images_language=en`;
-    if (qpage !== undefined) {
-        p = `${p}&page=${qpage}`;
-    }
+    var p = `${process.env.API_URL}/${qtype}/${qid}/images?include_image_language=en`;
     const r = await fetch(p, _utils.FETCH_OPT);
     if (!r.ok) {
-        return new Response("Bad request", {status: 404});
+        return new Response("Bad request", _utils.RES_BAD_OPT);
     }
     return new Response(r.body, _utils.RES_OPT);
 }
