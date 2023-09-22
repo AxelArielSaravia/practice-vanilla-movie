@@ -28,7 +28,7 @@ const API = {
     @type {(page: string) => Promise<maybe<MDBResponse<MDBTrending>>>} */
     getTrending(page = "1") {
         return (
-            fetch(`http://127.0.0.1:3333/api/trending?page=${page}`)
+            fetch(`${window.location.origin}/api/trending?page=${page}`)
             .then(fetchResolve)
         );
     },
@@ -39,7 +39,7 @@ const API = {
     ) => Promise<maybe<MDBResponse<MDBPopular>>>}*/
     getPopular(type, page = "1") {
         return (
-            fetch(`http://127.0.0.1:3333/api/popular?type=${type}&page=${page}`)
+            fetch(`${window.location.origin}/api/popular?type=${type}&page=${page}`)
             .then(fetchResolve)
         );
     },
@@ -50,7 +50,7 @@ const API = {
         page: string
     ) => Promise<maybe<MDBResponse<MDBDiscover>>>}*/
     getDiscover(type, genre, page = "1") {
-        var p = `http://127.0.0.1:3333/api/discover?type=${type}&page=${page}`;
+        var p = `${window.location.origin}/api/discover?type=${type}&page=${page}`;
         if (genre !== undefined) {
             p = `${p}&genre=${genre}`;
         }
@@ -64,7 +64,7 @@ const API = {
     ) => Promise<maybe<MDBImages>>} */
     getImages(id, type, page = "1") {
         return (
-            fetch(`http://127.0.0.1:3333/api/images?type=${type}&id=${id}&page=${page}`)
+            fetch(`${window.location.origin}/api/images?type=${type}&id=${id}&page=${page}`)
             .then(fetchResolve)
         );
     },
@@ -72,7 +72,7 @@ const API = {
     @type {(type: "movie" | "tv") => Promise<maybe<MDBGenres>>} */
     getGenres(type) {
         return (
-            fetch(`http://127.0.0.1:3333/api/genres?type=${type}`)
+            fetch(`${window.location.origin}/api/genres?type=${type}`)
             .then(fetchResolve)
         );
     },
@@ -83,7 +83,7 @@ const API = {
     ) => Promise<maybe<MDBResponse<MDBDiscover>>>} */
     getTopRated(type, page = "1") {
         return (
-            fetch(`http://127.0.0.1:3333/api/toprated?type=${type}&page=${page}`)
+            fetch(`${window.location.origin}/api/toprated?type=${type}&page=${page}`)
             .then(fetchResolve)
         );
     }

@@ -8,8 +8,9 @@ import images from "./api/images.js";
 import genres from "./api/genres.js";
 import toprated from "./api/toprated.js";
 
+const PORT = Number(process.env.VANILLA_MOVIE_PORT);
+
 const DIR = path.resolve(import.meta.dir, "src");
-const PORT = 3333;
 
 const RES_OPTS = {status: 404};
 const STATSYNC_OPTS = {bigint: false, throwIfNoEntry: false};
@@ -49,7 +50,7 @@ function staticResponse(req, reqPath) {
     return ResponseBad;
 }
 
-const server = Bun.serve({
+Bun.serve({
     port: PORT,
     async fetch(req) {
         console.info("New request URL:", req.url);
@@ -78,5 +79,4 @@ const server = Bun.serve({
         }
     }
 });
-
-console.log(`Server listening on http://127.0.0.1:${server.port}`);
+console.info(`Server listening on http://127.0.0.1:${PORT}`);
