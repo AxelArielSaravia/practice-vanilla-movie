@@ -764,7 +764,7 @@ main .hero-info .hero-description {
     }
 }
 
-.more {
+.more[data-display="1"] {
     display: block;
     padding: 8px;
     border-radius: 3px;

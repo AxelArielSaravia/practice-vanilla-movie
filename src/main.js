@@ -14,9 +14,14 @@ const TYPE = {
 };
 
 const CollectionState = {
-    MAX: 20,
-    genresMax: 0,
+    MAX: 15,
+    STEPS: 5,
+    len: 0,
     count: 7,
+    itv: 0,
+    tvGenres: null,
+    imov: 0,
+    movieGenres: null,
 };
 
 const MEDIA = {
@@ -250,7 +255,7 @@ const View = {
     data: Promise<maybe<object>>,
     DOMItem: HTMLButtonElement,
     DOMTIcon: HTMLTemplateElement,
-    backdropAlt: maybe<string>,
+    backdropAlt: null | string,
 ) => Promise<undefined>}*/
 async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
     var data = await dataP;
@@ -258,7 +263,7 @@ async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
         || data.backdrops === undefined
         || data.backdrops.length === 0
     ) {
-        if (backdropAlt !== undefined && backdropAlt.length > 0) {
+        if (backdropAlt !== null && backdropAlt.length > 0) {
             var DOMImg = DOMItem.lastElementChild;
             DOMImg.setAttribute(
                 "src",
@@ -339,7 +344,7 @@ function createDOMCollection(
     return DOMCollection;
 }
 
-async function discover(DataPromise, title, mediaType, i, DOM) {
+async function discover(DataPromise, title, mediaType, i, base, DOM) {
     var data = await DataPromise;
     console.info(title, data);
     if (data?.results === undefined || data.results.length === 0) {
@@ -353,10 +358,11 @@ async function discover(DataPromise, title, mediaType, i, DOM) {
         /*DOMTCollItem*/    DOM.templateCollItem,
         /*DOMTIcon*/        DOM.templateIcons
     );
-    var DOMPos = DOM.view.children[5 + i];
+    var DOMPos = DOM.view.children[base + i];
     DOMPos.insertAdjacentElement("beforebegin", DOMColl);
     DOMPos.remove();
 }
+
 
 
 window.addEventListener("DOMContentLoaded", function () {
@@ -423,6 +429,7 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerButtonNav.addEventListener("click", NavMethods.buttonNavOnclick);
     DOM.headerNav.addEventListener("focusout", NavMethods.navOnfocusout);
     DOM.headerNav.addEventListener("click", NavMethods.navOnclick);
+
 
     if(MEDIA.pointerFine.matches) {
         DOM.view.onclick = View.onclick;
@@ -566,7 +573,17 @@ window.addEventListener("DOMContentLoaded", function () {
         }
         var movieGenres = data[0].genres;
         var tvGenres = data[1].genres;
-        CollectionState.genresMax = movieGenres.length + tvGenres.length;
+        CollectionState.tvGenres = tvGenres;
+        CollectionState.movieGenres = movieGenres;
+
+        if (movieGenres.length + tvGenres.length < CollectionState.MAX) {
+            CollectionState.len = movieGenres.length + tvGenres.length;
+        } else {
+            CollectionState.len = CollectionState.MAX;
+        }
+        console.info(CollectionState)
+
+        DOM.buttonMore?.setAttribute("data-display", "1");
 
         if (movieGenres.length > 1) {
             utils.randomPermutation(movieGenres);
@@ -583,25 +600,101 @@ window.addEventListener("DOMContentLoaded", function () {
         var genreName;
         /** @type {string}*/
         var title;
+        var imov = 0;
+        var itv = 0;
         for (let i = 0; i < 2; i += 1) {
             if (Math.random() < 0.5) {
-                genre = movieGenres[i].id;
-                genreName = movieGenres[i].name;
+                genre = movieGenres[imov].id;
+                genreName = movieGenres[imov].name;
                 mediaType = "movie";
-                title = `${genreName} Tv series`;
-            } else {
-                genre = tvGenres[i].id;
-                genreName = tvGenres[i].name;
-                mediaType = "tv";
                 title = `${genreName} Movies`;
+                imov += 1;
+                CollectionState.imov += 1;
+            } else {
+                genre = tvGenres[itv].id;
+                genreName = tvGenres[itv].name;
+                mediaType = "tv";
+                title = `${genreName} Tv series`;
+                itv += 1;
+                CollectionState.itv += 1;
             }
             discover(
                 API.getDiscover(mediaType, genre, "1"),
                 title,
                 mediaType,
                 i,
+                5,
                 DOM
             );
+        }
+    });
+
+    DOM.buttonMore.addEventListener("click", function (e) {
+        /** @type {"movie" | "tv"}*/
+        var mediaType;
+        /** @type {number}*/
+        var genre;
+        /** @type {string}*/
+        var genreName;
+        /** @type {string}*/
+        var title;
+        var movieGenres = CollectionState.movieGenres;
+        var tvGenres = CollectionState.tvGenres;
+        var itv = CollectionState.itv;
+        var imov = CollectionState.imov;
+        var select = 0;
+
+        DOM.buttonMore?.setAttribute("data-display", "0");
+
+        var end = 0;
+        var full = false;
+        if (CollectionState.count + CollectionState.STEPS < CollectionState.len) {
+            end = CollectionState.count + CollectionState.STEPS;
+        } else {
+            end = CollectionState.len;
+            full = true;
+        }
+        for (var i = CollectionState.count; i < end; i += 1) {
+            var DOMClone = DOM.templateCollSkeleton.content.cloneNode(true);
+            DOM.view?.appendChild(DOMClone);
+        }
+
+        for (var i = CollectionState.count; i < end; i += 1) {
+            if (itv < tvGenres.length && imov < movieGenres.length) {
+                if (Math.random() < 0.5) {
+                    select = 1;
+                }
+            } else if (tv < tvGenres.length) {
+                select = 1;
+            }
+
+            if (select === 0) {
+                genre = movieGenres[imov].id;
+                genreName = movieGenres[imov].name;
+                mediaType = "movie";
+                title = `${genreName} Tv series`;
+                imov += 1;
+                CollectionState.imov += 1;
+            } else {
+                genre = tvGenres[itv].id;
+                genreName = tvGenres[itv].name;
+                mediaType = "tv";
+                title = `${genreName} Movies`;
+                itv += 1;
+                CollectionState.itv += 1;
+            }
+            CollectionState.count += 1;
+            discover(
+                API.getDiscover(mediaType, genre, "1"),
+                title,
+                mediaType,
+                i,
+                DOM.view.children.length - end,
+                DOM
+            );
+        }
+        if (!full) {
+            DOM.buttonMore?.setAttribute("data-display", "1");
         }
     });
 });
