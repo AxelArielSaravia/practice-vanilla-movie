@@ -165,7 +165,7 @@ const HeroMethods = {
         }
     },
     /**
-    @type {(path: string, DOMHero: HTMLDivElement) => undefined}*/
+    @type {(path: maybe<string>, DOMHero: HTMLDivElement) => undefined}*/
     initDOMImgLogo(path, DOMHero) {
         /**@type {HTMLElement}*/
         var DOMLogo = (
@@ -173,14 +173,13 @@ const HeroMethods = {
             .lastElementChild
             .firstElementChild
         );
-        if (path) {
+        if (path !== undefined) {
+            DOMLogo.firstElementChild.setAttribute("data-display", "0");
             DOMLogo.lastElementChild.setAttribute("data-display", "1");
             DOMLogo.lastElementChild.setAttribute(
                 "src",
                 `https://image.tmdb.org/t/p/w300${path}`
             );
-        } else {
-            DOMLogo.firstElementChild.setAttribute("data-display", "1");
         }
     },
     /**
@@ -200,8 +199,13 @@ const HeroMethods = {
             "src",
             `https://image.tmdb.org/t/p/w1280${hero.backdrop_path}`
         );
-        DOMHLogo.textContent = hero.title;
-        DOMDescription.textContent = hero.overview;
+        if (hero.media_type === "tv") {
+            DOMHLogo.insertAdjacentText("beforeend",hero.name);
+        } else {
+            DOMHLogo.insertAdjacentText("beforeend",hero.title);
+        }
+        DOMHLogo.setAttribute("data-display", "1");
+        DOMDescription.insertAdjacentText("beforeend",hero.overview);
     }
 };
 
@@ -270,9 +274,9 @@ async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
                 `https://image.tmdb.org/t/p/w400${backdropAlt}`
             );
             DOMImg.setAttribute("data-display", "1");
+            DOMItem.firstElementChild?.setAttribute("data-display", "0");
 
         } else {
-            DOMItem.firstElementChild.setAttribute("data-display", "1");
             var DOMIVideo = DOMTIcon.content.firstElementChild?.cloneNode(true);
             DOMItem.appendChild(DOMIVideo);
         }
@@ -285,6 +289,8 @@ async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
             `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
         );
         DOMImg.setAttribute("data-display", "1");
+        DOMItem.firstElementChild?.setAttribute("data-display", "0");
+
     }
 }
 
@@ -332,6 +338,8 @@ function createDOMCollection(
         }
         DOMItem.setAttribute("title", itemTitle);
         DOMItem.firstElementChild.insertAdjacentText("beforeend", itemTitle);
+        DOMItem.firstElementChild?.setAttribute("data-display", "1");
+
         DOMItem.lastElementChild.setAttribute("alt", itemTitle);
         setItemImage(
             API.getImages(dataItem.id, itemMediaType),
@@ -454,9 +462,7 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     heroPromise.then(HeroMethods.getHeroLogo).then(function (data) {
-        if (data !== undefined) {
-            HeroMethods.initDOMImgLogo(data, DOM.hero);
-        }
+        HeroMethods.initDOMImgLogo(data, DOM.hero);
     });
 
     heroPromise.then(function (data) {

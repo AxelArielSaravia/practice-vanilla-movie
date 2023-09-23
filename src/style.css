@@ -483,6 +483,9 @@ main .hero-info .hero-logo {
     max-width: 500px;
     min-height: 15vw;
 }
+main .hero-info .hero-logo h2 {
+    text-align: start;
+}
 
 main .hero-info .hero-description {
     margin-top: 10px;
@@ -567,7 +570,6 @@ main .hero-info .hero-description {
 :is(.collection,.collection-skeleton) .slider {
     display: flex;
     gap: 0 5px;
-    padding: var(--padding-block) var(--padding-inline);
     scroll-behavior: smooth;
 }
 
@@ -668,6 +670,9 @@ main .hero-info .hero-description {
         top: 0;
         left: 0;
     }
+    :is(.collection,.collection-skeleton) .slider {
+        padding: var(--padding-block) var(--padding-inline);
+    }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -712,6 +717,9 @@ main .hero-info .hero-description {
     }
     .collection .b-scroll {
         display: none;
+    }
+    :is(.collection,.collection-skeleton) .slider {
+        padding: 0 var(--padding-inline);
     }
 }
 
