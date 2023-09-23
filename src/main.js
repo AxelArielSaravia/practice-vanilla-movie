@@ -672,14 +672,14 @@ window.addEventListener("DOMContentLoaded", function () {
                 genre = movieGenres[imov].id;
                 genreName = movieGenres[imov].name;
                 mediaType = "movie";
-                title = `${genreName} Tv series`;
+                title = `${genreName} Movies`;
                 imov += 1;
                 CollectionState.imov += 1;
             } else {
                 genre = tvGenres[itv].id;
                 genreName = tvGenres[itv].name;
                 mediaType = "tv";
-                title = `${genreName} Movies`;
+                title = `${genreName} Tv series`;
                 itv += 1;
                 CollectionState.itv += 1;
             }
