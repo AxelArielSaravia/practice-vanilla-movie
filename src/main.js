@@ -174,7 +174,7 @@ const HeroMethods = {
             .firstElementChild
         );
         if (path !== undefined) {
-            DOMLogo.firstElementChild.setAttribute("data-display", "0");
+            DOMLogo.firstElementChild.setAttribute("data-opacity", "0");
             DOMLogo.lastElementChild.setAttribute("data-display", "1");
             DOMLogo.lastElementChild.setAttribute(
                 "src",
@@ -204,7 +204,6 @@ const HeroMethods = {
         } else {
             DOMHLogo.insertAdjacentText("beforeend",hero.title);
         }
-        DOMHLogo.setAttribute("data-display", "1");
         DOMDescription.insertAdjacentText("beforeend",hero.overview);
     }
 };
@@ -263,33 +262,28 @@ const View = {
 ) => Promise<undefined>}*/
 async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
     var data = await dataP;
+    var DOMImg = DOMItem.firstElementChild;
     if (data === undefined
         || data.backdrops === undefined
         || data.backdrops.length === 0
     ) {
         if (backdropAlt !== null && backdropAlt.length > 0) {
-            var DOMImg = DOMItem.lastElementChild;
             DOMImg.setAttribute(
                 "src",
                 `https://image.tmdb.org/t/p/w400${backdropAlt}`
             );
             DOMImg.setAttribute("data-display", "1");
-            DOMItem.firstElementChild?.setAttribute("data-display", "0");
-
-        } else {
-            var DOMIVideo = DOMTIcon.content.firstElementChild?.cloneNode(true);
-            DOMItem.appendChild(DOMIVideo);
+            DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
         }
     } else {
         var backdrop = data.backdrops[0];
         /** @type {HTMLImageElement}*/
-        var DOMImg = DOMItem.lastElementChild;
         DOMImg.setAttribute(
             "src",
             `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
         );
         DOMImg.setAttribute("data-display", "1");
-        DOMItem.firstElementChild?.setAttribute("data-display", "0");
+        DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
 
     }
 }
@@ -337,10 +331,9 @@ function createDOMCollection(
             itemTitle = dataItem.name;
         }
         DOMItem.setAttribute("title", itemTitle);
-        DOMItem.firstElementChild.insertAdjacentText("beforeend", itemTitle);
-        DOMItem.firstElementChild?.setAttribute("data-display", "1");
+        DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
 
-        DOMItem.lastElementChild.setAttribute("alt", itemTitle);
+        DOMItem.firstElementChild.setAttribute("alt", itemTitle);
         setItemImage(
             API.getImages(dataItem.id, itemMediaType),
             DOMItem,

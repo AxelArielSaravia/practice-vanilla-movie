@@ -209,6 +209,9 @@ button {
 [data-display="0"] {
     display: none;
 }
+[data-opacity="0"] {
+    opacity: 0;
+}
 
 .icon {
     color: var(--color-secondary);
@@ -484,7 +487,9 @@ main .hero-info .hero-logo {
     min-height: 15vw;
 }
 main .hero-info .hero-logo h2 {
+    position: absolute;
     text-align: start;
+    transition: opacity 300ms ease-out;
 }
 
 main .hero-info .hero-description {
@@ -613,7 +618,7 @@ main .hero-info .hero-description {
 }
 
 .collection .slider .item {
-    background: var(--color-loading);
+    background-color: var(--color-loading);
 }
 
 .collection .slider .item::after {
@@ -626,11 +631,17 @@ main .hero-info .hero-description {
 
 .collection .slider .item h3 {
     position: absolute;
+    padding: 0 10px;
+    transition: opacity 300ms ease-out;
+    z-index: 1;
 }
 
 .collection .slider .item img {
+    position: relative;
+    z-index: 1;
     width: 100%;
 }
+
 .collection .slider .item .icon-video {
     position: absolute;
     width: 50%;
@@ -638,6 +649,7 @@ main .hero-info .hero-description {
     margin: auto;
     opacity: 0.2;
     transform: rotate(-25deg);
+    z-index: 0;
 }
 
 
@@ -676,19 +688,6 @@ main .hero-info .hero-description {
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .collection .b-scroll:not(:hover,:focus) {
-        opacity: 0;
-    }
-    .collection .b-scroll:is(:hover,:focus) {
-        opacity: 0.8;
-    }
-    .collection .slider .item {
-        transition: transform 300ms ease-out;
-    }
-    .collection .slider .item:hover {
-        transform: scale(1.06);
-        z-index: 2;
-    }
     .collection .title:hover {
         opacity: 0.8;
     }
@@ -700,6 +699,21 @@ main .hero-info .hero-description {
     }
     .collection .title:not(:hover)::after {
         opacity: 0;
+    }
+
+    .collection .b-scroll:not(:hover,:focus) {
+        opacity: 0;
+    }
+    .collection .b-scroll:is(:hover,:focus) {
+        opacity: 0.8;
+    }
+
+    .collection .slider .item {
+        transition: transform 300ms ease-out;
+    }
+    .collection .slider .item:hover {
+        transform: scale(1.06);
+        z-index: 2;
     }
 }
 
