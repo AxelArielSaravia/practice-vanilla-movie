@@ -40,18 +40,21 @@ if [ $media = 1 ]; then
 fi
 
 
+
 if [ $api = 1 ]; then
     api_dir="$dir/api"
     if [ ! -d "$api_dir" ]; then
         mkdir $api_dir
         echo Create $api_dir
     fi
-    minify -o $api_dir/_utils.js    ./api/_utils.js
     minify -o $api_dir/discover.js  ./api/discover.js
     minify -o $api_dir/genres.js    ./api/genres.js
     minify -o $api_dir/images.js    ./api/images.js
+    minify -o $api_dir/movie.js     ./api/movie.js
     minify -o $api_dir/popular.js   ./api/popular.js
     minify -o $api_dir/toprated.js  ./api/toprated.js
     minify -o $api_dir/trending.js  ./api/trending.js
+    minify -o $api_dir/tv.js        ./api/tv.js
+    minify -o $api_dir/_utils.js    ./api/_utils.js
     echo API minified success
 fi
