@@ -85,6 +85,17 @@ const API = {
             fetch(`${window.location.origin}/api/toprated?type=${type}&page=${page}`)
             .then(fetchResolve)
         );
+    },
+    /**
+    @type {(
+        type: "movie" | "tv",
+        id: string
+    ) => Promise<maybe<MDBIMovie | MDBITv>>} */
+    get(type, id) {
+        return (
+            fetch(`${window.location.origin}/api/${type}?id=${id}`)
+            .then(fetchResolve)
+        );
     }
 };
 

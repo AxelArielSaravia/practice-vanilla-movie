@@ -11,6 +11,15 @@ const TYPE = {
     /**
     @type {"5"}*/
     COLL_BUTTON: "5",
+    /**
+    @type {"6"} */
+    COLL_ITEM: "6",
+    /**
+    @type {"8"} */
+    MODAL: "8",
+    /**
+    @type {"9"} */
+    MODAL_CLOSE: "9",
 };
 
 const CollectionState = {
@@ -23,10 +32,6 @@ const CollectionState = {
     imov: 0,
     movieGenres: null,
 };
-
-const MEDIA = {
-    pointerFine: window.matchMedia("(pointer: fine)"),
-}
 
 const Theme = {
     /**
@@ -192,18 +197,23 @@ const HeroMethods = {
         /**@type {HTMLElement}*/
         var DOMHLogo = DOMInfo.firstElementChild.firstElementChild;
         /**@type {HTMLParamElement}*/
-        var DOMDescription = DOMInfo.children[2];
+        var DOMDescription = DOMInfo.lastElementChild;
 
         DOMImgBg.setAttribute("data-display", "1");
         DOMImgBg.setAttribute(
             "src",
             `https://image.tmdb.org/t/p/w1280${hero.backdrop_path}`
         );
+
         if (hero.media_type === "tv") {
             DOMHLogo.insertAdjacentText("beforeend",hero.name);
         } else {
             DOMHLogo.insertAdjacentText("beforeend",hero.title);
         }
+
+        DOMInfo.setAttribute("data-media", hero.media_type);
+        DOMInfo.setAttribute("data-id", hero.id);
+
         DOMDescription.insertAdjacentText("beforeend",hero.overview);
     }
 };
@@ -211,139 +221,169 @@ const HeroMethods = {
 
 const View = {
     TYPE_SBUTTON: "data-sbuttont",
-    onclick(e) {
-        /** @type {HTMLButtonElement | null}*/
-        var target = e.target;
-        if (target?.getAttribute("data-type") === TYPE.COLL_BUTTON) {
-            /**@type {HTMLElement}*/
-            var DOMSlider = target.parentElement.lastElementChild;
-            /**@type {HTMLButtonElement}*/
-            const DOMButtonL = target.parentElement.children[1];
-            /**@type {HTMLButtonElement}*/
-            const DOMButtonR = target.parentElement.children[2];
-            var type = target.getAttribute(View.TYPE_SBUTTON);
-            var scrollval = (
-                DOMSlider.clientWidth
+    topScroll: 0,
+    DOMCollButtonOnclick(target) {
+        /**@type {HTMLElement}*/
+        var DOMSlider = target.parentElement.lastElementChild;
+        /**@type {HTMLButtonElement}*/
+        const DOMButtonL = target.parentElement.children[1];
+        /**@type {HTMLButtonElement}*/
+        const DOMButtonR = target.parentElement.children[2];
+        var type = target.getAttribute(View.TYPE_SBUTTON);
+        var scrollval = (
+            DOMSlider.clientWidth
                 - (
                     (DOMSlider.clientWidth * 6) / 100
                 )
-            );
+        );
+        if (DOMSlider.scrollLeft - scrollval <= 0) {
+            DOMButtonL.setAttribute("data-display", "0");
+        } else {
+            DOMButtonL.setAttribute("data-display", "1");
+        }
+        if (type === "0") {
+            DOMSlider.scrollBy(-scrollval, 0);
             if (DOMSlider.scrollLeft - scrollval <= 0) {
                 DOMButtonL.setAttribute("data-display", "0");
-            } else {
-                DOMButtonL.setAttribute("data-display", "1");
             }
-            if (type === "0") {
-                DOMSlider.scrollBy(-scrollval, 0);
-                if (DOMSlider.scrollLeft - scrollval <= 0) {
-                    DOMButtonL.setAttribute("data-display", "0");
-                }
-                DOMButtonR.setAttribute("data-display", "1");
-            } else {
-                DOMSlider.scrollBy(scrollval, 0);
-                if (
-                    DOMSlider.scrollLeft + scrollval
+            DOMButtonR.setAttribute("data-display", "1");
+        } else {
+            DOMSlider.scrollBy(scrollval, 0);
+            if (
+                DOMSlider.scrollLeft + scrollval
                     >= DOMSlider.scrollWidth - DOMSlider.clientWidth
-                ) {
-                    DOMButtonR.setAttribute("data-display", "0");
-                }
-                DOMButtonL.setAttribute("data-display", "1");
+            ) {
+                DOMButtonR.setAttribute("data-display", "0");
             }
+            DOMButtonL.setAttribute("data-display", "1");
         }
     },
-}
-
-/**
-@type {(
-    data: Promise<maybe<object>>,
-    DOMItem: HTMLButtonElement,
-    DOMTIcon: HTMLTemplateElement,
-    backdropAlt: null | string,
-) => Promise<undefined>}*/
-async function setItemImage(dataP, DOMItem, DOMTIcon, backdropAlt) {
-    var data = await dataP;
-    var DOMImg = DOMItem.firstElementChild;
-    if (data === undefined
-        || data.backdrops === undefined
-        || data.backdrops.length === 0
-    ) {
-        if (backdropAlt !== null && backdropAlt.length > 0) {
+    /**
+    @type {(
+        data: Promise<maybe<object>>,
+        DOMItem: HTMLButtonElement,
+        backdropAlt: null | string,
+    ) => Promise<undefined>}*/
+    async setItemImage(dataP, DOMItem, backdropAlt) {
+        var data = await dataP;
+        var DOMImg = DOMItem.firstElementChild;
+        if (data === undefined
+            || data.backdrops === undefined
+            || data.backdrops.length === 0
+        ) {
+            if (backdropAlt !== null && backdropAlt.length > 0) {
+                DOMImg.setAttribute(
+                    "src",
+                    `https://image.tmdb.org/t/p/w400${backdropAlt}`
+                );
+                DOMImg.setAttribute("data-display", "1");
+                DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
+            }
+        } else {
+            var backdrop = data.backdrops[0];
+            /** @type {HTMLImageElement}*/
             DOMImg.setAttribute(
                 "src",
-                `https://image.tmdb.org/t/p/w400${backdropAlt}`
+                `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
             );
             DOMImg.setAttribute("data-display", "1");
             DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
         }
-    } else {
-        var backdrop = data.backdrops[0];
-        /** @type {HTMLImageElement}*/
-        DOMImg.setAttribute(
-            "src",
-            `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
-        );
-        DOMImg.setAttribute("data-display", "1");
-        DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
+    },
+    /**
+    @type {(
+        header: string,
+        data: object,
+        mediaType: "movie" | "tv" | undefined,
+        DOMTCollection: HTMLTemplateElement,
+        DOMTCollItem: HTMLTemplateElement,
+    ) => HTMLElement}*/
+    createDOMCollection(
+        header,
+        data,
+        mediaType,
+        DOMTCollection,
+        DOMTCollItem,
+    ) {
+        /**@type {HTMLTemplateElement}*/
+        var DOMClone = DOMTCollection.content.cloneNode(true);
+        /**@type {HTMLElement}*/
+        var DOMCollection = DOMClone.firstElementChild;
+        //DOMCollection.children[0].insertAdjacentText("beforeend", header);
+        var DOMTitle = DOMCollection.children[0]
+        DOMTitle.insertAdjacentText("beforeend", header);
 
-    }
-}
+        for (var dataItem of data) {
+            /**@type {HTMLButtonElement}*/
+            const DOMItem = DOMTCollItem.content.cloneNode(true).firstElementChild;
+            DOMItem.setAttribute("data-id", dataItem.id);
+            let itemTitle;
+            /**@type {"movie"| "tv"} */
+            let itemMediaType;
+            if (mediaType !== undefined) {
+                itemMediaType = mediaType;
+            } else {
+                itemMediaType = dataItem.media_type;
+            }
+            if (itemMediaType === "movie") {
+                itemTitle = dataItem.title;
+            } else {
+                itemTitle = dataItem.name;
+            }
+            DOMItem.setAttribute("title", itemTitle);
+            DOMItem.setAttribute("data-media", itemMediaType);
+            DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
 
-/**
-@type {(
-    header: string,
-    data: object,
-    mediaType: "movie" | "tv" | undefined,
-    DOMTCollection: HTMLTemplateElement,
-    DOMTCollItem: HTMLTemplateElement,
-    DOMTIcon: HTMLTemplateElement
-) => HTMLElement}*/
-function createDOMCollection(
-    header,
-    data,
-    mediaType,
-    DOMTCollection,
-    DOMTCollItem,
-    DOMTIcon
-) {
-    /**@type {HTMLTemplateElement}*/
-    var DOMClone = DOMTCollection.content.cloneNode(true);
-    /**@type {HTMLElement}*/
-    var DOMCollection = DOMClone.firstElementChild;
-    //DOMCollection.children[0].insertAdjacentText("beforeend", header);
-    var DOMTitle = DOMCollection.children[0]
-    DOMTitle.insertAdjacentText("beforeend", header);
-
-    for (var dataItem of data) {
-        /**@type {HTMLButtonElement}*/
-        const DOMItem = DOMTCollItem.content.cloneNode(true).firstElementChild;
-        DOMItem.setAttribute("data-id", dataItem.id);
-        let itemTitle;
-        /**@type {"movie"| "tv"} */
-        let itemMediaType;
-        if (mediaType !== undefined) {
-            itemMediaType = mediaType;
-        } else {
-            itemMediaType = dataItem.media_type;
+            DOMItem.firstElementChild.setAttribute("alt", itemTitle);
+            View.setItemImage(
+                API.getImages(dataItem.id, itemMediaType),
+                DOMItem,
+                dataItem.backdrop_path
+            );
+            DOMCollection.lastElementChild.appendChild(DOMItem);
         }
-        if (itemMediaType === "movie") {
-            itemTitle = dataItem.title;
-        } else {
-            itemTitle = dataItem.name;
-        }
-        DOMItem.setAttribute("title", itemTitle);
-        DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
-
-        DOMItem.firstElementChild.setAttribute("alt", itemTitle);
-        setItemImage(
-            API.getImages(dataItem.id, itemMediaType),
-            DOMItem,
-            DOMTIcon,
-            dataItem.backdrop_path
-        );
-        DOMCollection.lastElementChild.appendChild(DOMItem);
+        return DOMCollection;
     }
-    return DOMCollection;
-}
+};
+
+const Modal = {
+    async open(DOMModal, typeMedia, id) {
+        var data = await API.get(typeMedia, id);
+        var DOMModalItem;
+        if (typeMedia === "tv") {
+            DOMModalItem = DOMModal.children[0];
+            var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
+            var DOMTitle = DOMModalItem.children[2].children[1];
+            var DOMDescription = DOMModalItem.children[2].children[2];
+            if (data?.backdrop_path != null) {
+                DOMImg.setAttribute(
+                    "src",
+                    `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
+                );
+                DOMImg.setAttribute("alt", data.name);
+                DOMImg.setAttribute("data-display", "1");
+            }
+            DOMTitle.textContent = data.name;
+            DOMDescription.textContent = data?.overview;
+        } else {
+           DOMModalItem = DOMModal.children[1];
+            var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
+            var DOMTitle = DOMModalItem.children[2].children[1];
+            var DOMDescription = DOMModalItem.children[2].children[2];
+            if (data?.backdrop_path != null) {
+                DOMImg.setAttribute(
+                    "src",
+                    `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
+                );
+                DOMImg.setAttribute("alt", data.title);
+                DOMImg.setAttribute("data-display", "1");
+            }
+            DOMTitle.textContent = data.title;
+            DOMDescription.textContent = data?.overview;
+        }
+        console.info(data);
+    },
+};
 
 async function discover(DataPromise, title, mediaType, i, base, DOM) {
     var data = await DataPromise;
@@ -351,7 +391,7 @@ async function discover(DataPromise, title, mediaType, i, base, DOM) {
     if (data?.results === undefined || data.results.length === 0) {
         throw Error("API.getTopRated does not have data");
     }
-    var DOMColl = createDOMCollection(
+    var DOMColl = View.createDOMCollection(
         /*header*/          title,
         /*data*/            data.results,
         /*mediaType*/       mediaType,
@@ -363,8 +403,6 @@ async function discover(DataPromise, title, mediaType, i, base, DOM) {
     DOMPos.insertAdjacentElement("beforebegin", DOMColl);
     DOMPos.remove();
 }
-
-
 
 window.addEventListener("DOMContentLoaded", function () {
     var DOM = {
@@ -383,6 +421,8 @@ window.addEventListener("DOMContentLoaded", function () {
         hero: document.getElementById("hero"),
         view: document.getElementById("view"),
         buttonMore: document.getElementById("button-more"),
+
+        modal: document.getElementById("modal")
     };
 
     if (DOM.templateCollection === null) {
@@ -421,6 +461,9 @@ window.addEventListener("DOMContentLoaded", function () {
     if (DOM.buttonMore === null) {
         throw Error("DOM.buttonMore is null");
     }
+    if (DOM.modal === null) {
+        throw Error("DOM.modal is null");
+    }
 
     Theme.init();
 
@@ -431,18 +474,80 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerNav.addEventListener("focusout", NavMethods.navOnfocusout);
     DOM.headerNav.addEventListener("click", NavMethods.navOnclick);
 
+    DOM.view.addEventListener("click", function (e) {
+        /**
+        @type {HTMLElement | null}*/
+        var target = e.target;
+        var type = target.getAttribute("data-type");
+        if (type === TYPE.COLL_BUTTON) {
+            View.DOMCollButtonOnclick(target);
+        } else if (type === TYPE.COLL_ITEM) {
+            var mediaType = target?.getAttribute("data-media");
+            var id = target?.getAttribute("data-id");
 
-    if(MEDIA.pointerFine.matches) {
-        DOM.view.onclick = View.onclick;
-    }
+            View.topScroll = document.firstElementChild.scrollTop;
+            document.firstElementChild.scrollTop = 0;
 
-    MEDIA.pointerFine.onchange = function (e) {
-        if(e.matches) {
-            DOM.view.onclick = View.onclick;
-        } else {
-            DOM.view.onclick = null;
+            DOM.modal.setAttribute("data-display", "1");
+            DOM.modal.setAttribute("data-select", mediaType);
+
+            DOM.main.style.setProperty(
+                "transform",
+                `translateY(-${View.topScroll}px)`
+            );
+            DOM.main.style.setProperty("position", "fixed");
+
+            Modal.open(DOM.modal, mediaType, id);
         }
-    }
+    });
+
+    DOM.hero.lastElementChild.addEventListener("click", function (e) {
+        var target = e.target;
+        var id = target?.getAttribute("data-id");
+        if (id !== undefined)  {
+            var mediaType = target?.getAttribute("data-media");
+
+            View.topScroll = document.firstElementChild.scrollTop;
+            document.firstElementChild.scrollTop = 0;
+
+            DOM.modal.setAttribute("data-display", "1");
+            DOM.modal.setAttribute("data-select", mediaType);
+
+            DOM.main.style.setProperty(
+                "transform",
+                `translateY(-${View.topScroll}px)`
+            );
+            DOM.main.style.setProperty("position", "fixed");
+
+            Modal.open(DOM.modal, mediaType, id);
+        }
+    });
+
+    DOM.modal.addEventListener("click", function (e) {
+        var target = e.target;
+        var type = target.getAttribute("data-type");
+        if (type === TYPE.MODAL || type === TYPE.MODAL_CLOSE) {
+            DOM.modal.setAttribute("data-display", "0");
+            var type = DOM.modal.getAttribute("data-select");
+            var DOMModalItem;
+            if (type === "tv") {
+                DOMModalItem = DOM.modal.children[0];
+            } else {
+                DOMModalItem = DOM.modal.children[1];
+            }
+            var DOMImg = DOMModalItem.children[1].firstElementChild?.firstElementChild;
+            var DOMTitle = DOMModalItem.children[2].children[1];
+            var DOMDescription = DOMModalItem.children[2].children[2];
+            DOMImg.setAttribute("data-display", "0");
+            DOMTitle.textContent = "";
+            DOMDescription.textContent = "";
+
+            DOM.main.style.removeProperty("transform");
+            DOM.main.style.setProperty("position", "relative");
+
+            document.firstElementChild.scrollTop = View.topScroll;
+        }
+    });
 
     var trendingPromise = API.getTrending("1");
     trendingPromise.then(function (data) {
@@ -468,7 +573,7 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTrending does not have data");
         }
-        var DOMColl = createDOMCollection(
+        var DOMColl = View.createDOMCollection(
             /*header*/          "Week Trendings",
             /*data*/            data.results,
             /*mediaType*/       undefined,
@@ -486,7 +591,7 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        var DOMColl = createDOMCollection(
+        var DOMColl = View.createDOMCollection(
             /*header*/          "Popular Movies",
             /*data*/            data.results,
             /*mediaType*/       "movie",
@@ -504,7 +609,7 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        var DOMColl = createDOMCollection(
+        var DOMColl = View.createDOMCollection(
             /*header*/          "Popular Tv series",
             /*data*/            data.results,
             /*mediaType*/       "tv",
@@ -522,7 +627,7 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = createDOMCollection(
+        var DOMColl = View.createDOMCollection(
             /*header*/          "Top rated movie",
             /*data*/            data.results,
             /*mediaType*/       "movie",
@@ -540,7 +645,7 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = createDOMCollection(
+        var DOMColl = View.createDOMCollection(
             /*header*/          "Top rated tv serie",
             /*data*/            data.results,
             /*mediaType*/       "tv",

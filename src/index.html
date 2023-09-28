@@ -11,7 +11,7 @@
     >
     <meta name="keywords" content="fake, movie, vanilla, javascript">
     <meta name="canonical" href="https://aas-vanilla-movie.web.app">
-    <title>Vanilla Movie App</title>
+    <title>The Fake App</title>
     <link rel="stylesheet" href="style.css"/>
     <script src="main.js" type="module"></script>
 </head>
@@ -123,11 +123,10 @@
             </button>
         </div>
     </header>
-    <main id="main">
-        <button id="hero" class="hero" data-show="1">
-            <div class="hero-background">
+    <div id="main" style="position:relative">
+        <section id="hero" class="hero">
+            <div class="background">
                 <img
-                    class="hero-img"
                     src=""
                     loading="lazy"
                     alt="hero background"
@@ -136,10 +135,8 @@
                 <div class="hero-left-gradient"></div>
                 <div class="hero-bottom-gradient"></div>
             </div>
-            <article
-                class="hero-info"
-            >
-                <header class="hero-logo">
+            <button class="info" data-id="" data-media="">
+                <div class="logo">
                     <h2 data-opacity="1"></h2>
                     <img
                         src=""
@@ -147,12 +144,11 @@
                         alt="hero logo"
                         data-display="0"
                     />
-                </header>
-                <p class="hero-ratings"></p>
-                <p class="hero-description"></p>
-            </article>
-        </button>
-        <div id="view" class="view">
+                </div>
+                <p class="description"></p>
+            </button>
+        </section>
+        <main id="view" class="view">
             <section class="collection-skeleton" data-pos="0">
                 <h2 class="title">Loading</h2>
                 <section class="slider">
@@ -234,9 +230,10 @@
                     <div class="item"></div>
                     <div class="item"></div>
                     <div class="item"></div>
+                    <div class="item"></div>
                 </section>
             </section>
-        </div>
+        </main>
         <button
             id="button-more"
             class="more"
@@ -245,19 +242,83 @@
         >
             More
         </button>
-    </main>
-    <footer>
-        <p class="social">
+        <footer>
+            <p class="social">
             <span>
                 create by
                 <a
-                    href="https://github.com/AxelArielSaravia/"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                   href="https://github.com/AxelArielSaravia/"
+                   target="_blank"
+                   rel="noopener noreferrer"
                 >Axel Ariel Saravia</a>
             </span>
-        </p>
-    </footer>
+            </p>
+        </footer>
+    </div>
+    <div
+        id="modal"
+        class="modal"
+        data-type="8"
+        data-display="0"
+        data-select="tv"
+    >
+        <article class="item tv">
+            <button class="close" data-type="9">
+                <svg
+                    class="icon icon-x"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="background">
+                <div class="image">
+                    <img src="" alt="" data-display="0">
+                    <div class="bottom-gradient"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div></div>
+                <h3></h3>
+                <p class="description"></p>
+            </div>
+        </article>
+        <article class="item movie">
+            <button class="close" data-type="9">
+                <svg
+                    class="icon icon-x"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="background">
+                <div class="image">
+                    <img src="" alt="" data-display="0">
+                    <div class="bottom-gradient"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div></div>
+                <h3></h3>
+                <p class="description"></p>
+            </div>
+        </article>
+    </div>
     <template id="template_collection-skeleton">
         <section class="collection-skeleton">
             <h2 class="title">Loading</h2>
@@ -323,7 +384,7 @@
         </section>
     </template>
     <template id="template_collection-item">
-        <button class="item" data-id="">
+        <button class="item" data-id="" data-type="6" data-media="">
             <img alt="" src="" data-display="0" loading="lazy">
             <svg
                 class="icon icon-video"

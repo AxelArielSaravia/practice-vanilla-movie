@@ -1,12 +1,14 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import * as fs      from "node:fs";
+import * as path    from "node:path";
 
 import trending from "./api/trending.js";
-import popular from "./api/popular.js";
+import popular  from "./api/popular.js";
 import discover from "./api/discover.js";
-import images from "./api/images.js";
-import genres from "./api/genres.js";
+import images   from "./api/images.js";
+import genres   from "./api/genres.js";
 import toprated from "./api/toprated.js";
+import movie    from "./api/movie.js";
+import tv       from "./api/tv.js";
 
 const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 
@@ -72,6 +74,10 @@ Bun.serve({
                 return genres(req);
             } else if (reqPath.endsWith("toprated")) {
                 return toprated(req);
+            } else if (reqPath.endsWith("movie")) {
+                return movie(req);
+            } else if (reqPath.endsWith("tv")) {
+                return tv(req);
             }
             return ResponseBad;
         } else {

@@ -33,6 +33,7 @@
     --font-footer-media: 1.2rem;
     --bradius-3: 3px;
     --bradius-5: 5px;
+    --bradius-10: 10px;
     --bradius-r: 50%;
 }
 
@@ -77,6 +78,7 @@
         );
     }
 }
+
 :root.dark {
     color-scheme: dark;
     --color-primary: #1c1a1a;
@@ -126,6 +128,7 @@
         );
     }
 }
+
 :root.light {
     color-scheme: light;
     --color-primary: #cdcdcd;
@@ -224,6 +227,7 @@ body {
     font-family: var(--font-body);
     font-weight: normal;
 
+    position: relative;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
@@ -254,9 +258,8 @@ body {
     min-height: var(--header-min-height);
     width: 100%;
     padding: 0 2rem;
-    background-image: linear-gradient(180deg,var(--color-primary) 0,transparent);
-    user-select: none;
-    z-index: 5;
+    background-image: linear-gradient(180deg,var(--color-primary) 0,var(--color-primary) 10%,transparent);
+    z-index: 10;
 }
 
 .header .logo {
@@ -283,7 +286,7 @@ body {
 }
 
 .header .primary-nav .nav-tab a {
-    display:flex;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -325,7 +328,7 @@ body {
 
     .header .primary-nav .nav {
         position: absolute;
-        transform: translate(-70px, 0px);
+        transform: translate(-70px, 5px);
         min-width: 200px;
         width: 40vw;
     }
@@ -342,8 +345,7 @@ body {
     .header .primary-nav:has( .nav[data-mbshow="1"]) .nav-button {
         font-weight: 900;
         background: var(--header-bg);
-        border-top-left-radius: var(--bradius-5);
-        border-top-right-radius: var(--bradius-5);
+        border-radius: var(--bradius-5);
     }
 
     .header .primary-nav .nav .nav-tab {
@@ -400,33 +402,33 @@ body {
 }
 
 /*Main*/
-main {
+#main {
     flex-grow: 1;
-    position:relative;
+    position: relative;
     min-height: 1000px;
     margin-top: var(--main-margin-top);
-    margin-bottom: 50px;
 }
 
-main .hero {
+/*Hero*/
+.hero {
     width: 100%;
     z-index: 1;
 }
 
-main .hero-background {
+.hero .background {
     position: absolute;
     top: 0;
     width: 100%;
     background: var(--color-skeleton);
 }
 
-main .hero-background img {
+.hero .background img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-main .hero-background .hero-left-gradient {
+.hero .background .hero-left-gradient {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -434,7 +436,7 @@ main .hero-background .hero-left-gradient {
     background: var(--hero-left-gradient);
     opacity: 1;
 }
-main .hero-background .hero-bottom-gradient {
+.hero .background .hero-bottom-gradient {
     position: absolute;
     bottom: -10px;
     top: auto;
@@ -446,31 +448,31 @@ main .hero-background .hero-bottom-gradient {
 }
 
 @media (max-width: 379px) {
-    main .hero {
+    .hero {
         height: 200px;
     }
-    main .hero-background {
+    .hero .background {
         height: 250px;
     }
-    main .hero-background .hero-left-gradient {
+    .hero .background .hero-left-gradient {
         right: 0;
     }
 }
 
 @media (min-width: 380px) {
-    main .hero {
+    .hero {
         padding-bottom: 40%;
         margin-bottom: 20px;
     }
-    main .hero-background {
+    .hero .background {
         height: 56vw;
     }
-    main .hero-background .hero-left-gradient {
+    .hero .background .hero-left-gradient {
         right: 26%;
     }
 }
 
-main .hero-info {
+.hero .info {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -480,26 +482,43 @@ main .hero-info {
     height: min-content;
 }
 
-main .hero-info .hero-logo {
-    display:flex;
-    align-items:flex-end;
+.hero .info::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .hero .info .logo img {
+        transition: transform 300ms ease-out;
+    }
+    .hero .info:hover .logo :is(h2,img){
+        transform: scale(1.06);
+    }
+}
+
+.hero .info .logo {
+    display: flex;
+    align-items: flex-end;
     max-width: 500px;
     min-height: 15vw;
 }
-main .hero-info .hero-logo h2 {
+.hero .info .logo h2 {
     position: absolute;
     text-align: start;
-    transition: opacity 300ms ease-out;
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
 }
 
-main .hero-info .hero-description {
+.hero .info .description {
     margin-top: 10px;
     font-size: var(--font-size);
     text-align: left;
 }
 
 @media (max-width: 880px) {
-    main .hero-info .hero-description {
+    .hero .info .description {
         clip: rect(0 0 0 0);
         clip-path: inset(50%);
         height: 1px;
@@ -511,34 +530,34 @@ main .hero-info .hero-description {
 }
 
 @media (min-width: 381px) and (max-width: 880px) {
-    main .hero-info .hero-logo img {
+    .hero .info .logo img {
         width: 100%;
     }
 }
 
 @media (max-width: 380px) {
-    main .hero-info {
+    .hero .info {
         right: 4%;
     }
-    main .hero-info .hero-logo img {
+    .hero .info .logo img {
         max-width: 170px;
     }
 }
 
 @media (min-width: 381px) and (max-width: 1440px) {
-    main .hero-info {
+    .hero .info {
         width: 35vw;
     }
-    main .hero-info img {
+    .hero .info img {
         width: 30vw;
     }
 }
 
 @media (min-width: 1441px) {
-    main .hero-info {
+    .hero .info {
         width: 30vw;
     }
-    main .hero-info img {
+    .hero .info img {
         width: 25vw;
     }
 }
@@ -588,10 +607,10 @@ main .hero-info .hero-description {
     width: var(--padding-inline);
     height: var(--item-height);
     position: absolute;
+    z-index: 2;
 }
 
 :is(.collection,.collection-skeleton) .slider::before {
-    z-index: 1;
     transform: translateX(-100%);
     background: var(--left-bg);
 }
@@ -627,6 +646,7 @@ main .hero-info .hero-description {
     width: 100%;
     height: 100%;
     inset: 0;
+    z-index: 2;
 }
 
 .collection .slider .item h3 {
@@ -694,17 +714,20 @@ main .hero-info .hero-description {
     .collection .title::after {
         transition: opacity 500ms ease-out;
     }
+
     .collection .title:hover::after {
         opacity: 1;
     }
+
     .collection .title:not(:hover)::after {
         opacity: 0;
     }
 
-    .collection .b-scroll:not(:hover,:focus) {
+    .collection:not(:hover) .b-scroll {
         opacity: 0;
     }
-    .collection .b-scroll:is(:hover,:focus) {
+
+    .collection:hover .b-scroll {
         opacity: 0.8;
     }
 
@@ -798,10 +821,11 @@ main .hero-info .hero-description {
 footer {
     background: var(--footer-bg);
     color: var(--footer-color);
-    position:relative;
+    position: relative;
     z-index: 1;
-    padding: 50px 0;
     width: 100%;
+    padding: 50px 0;
+    margin-top: 50px;
 }
 
 footer a {
@@ -822,4 +846,127 @@ footer a {
     footer a:hover {
         text-decoration: underline;
     }
+}
+
+
+/*Modal*/
+.modal {
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    padding: 10px;
+    margin-top: var(--main-margin-top);
+
+    overflow: auto;
+    overscroll-behavior: none;
+}
+
+.modal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-secondary);
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.modal[data-display="1"] {
+    display: flex;
+    justify-content: center;
+}
+
+.modal[data-loading="0"] .skeleton,
+.modal[data-loading="1"] .item,
+.modal[data-select="tv"] .movie,
+.modal[data-select="movie"] .tv {
+    display: none;
+}
+
+.modal article {
+    position: relative;
+    max-width: 1000px;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-primary);
+    border-radius: var(--bradius-10);
+    margin: 50px 0 20px;
+    z-index: 2;
+}
+
+.modal .close {
+    position: absolute;
+    display: flex;
+    background: var(--color-primary);
+    border-radius: 50%;
+    right: 0;
+    z-index: 2;
+    transform: translate(-10px, 10px);
+    padding: 4px;
+
+}
+
+.modal .close::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+}
+
+.modal .close svg {
+    width: var(--icon-size);
+}
+
+.modal .item .background {
+    position: relative;
+    padding-bottom: 40%;
+    width: 100%;
+}
+
+.modal .item .background .image {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 46vw;
+    max-height: 565px;
+    overflow: hidden;
+    border-start-start-radius: var(--bradius-10);
+    border-start-end-radius: var(--bradius-10);
+    background: var(--color-skeleton);
+}
+
+.modal .item .background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal .item .background .bottom-gradient {
+    position: absolute;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    height: 50%;
+    background-color: transparent;
+    background-image: linear-gradient(180deg, transparent, var(--color-primary));
+    opacity: 1;
+}
+
+.modal .item .content {
+    position: relative;
+    z-index: 1;
+    padding: 0 30px;
+    margin-top: 20px;
+}
+
+.modal .item .content h3 {
+    font-size: 3rem;
+}
+.modal .item .content p {
+    font-size: 1.5rem;
 }
