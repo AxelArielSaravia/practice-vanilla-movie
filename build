@@ -47,6 +47,7 @@ if [ $api = 1 ]; then
         mkdir $api_dir
         echo Create $api_dir
     fi
+    minify -o $api_dir/credits.js  ./api/credits.js
     minify -o $api_dir/discover.js  ./api/discover.js
     minify -o $api_dir/genres.js    ./api/genres.js
     minify -o $api_dir/images.js    ./api/images.js

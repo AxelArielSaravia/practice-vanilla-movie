@@ -20,6 +20,12 @@ const TYPE = {
     /**
     @type {"9"} */
     MODAL_CLOSE: "9",
+    /**
+    @type {"10"} */
+    MODAL_GENRE: "10",
+    /**
+    @type {"11"} */
+    MODAL_COMPANY: "11",
 };
 
 const CollectionState = {
@@ -295,27 +301,23 @@ const View = {
         header: string,
         data: object,
         mediaType: "movie" | "tv" | undefined,
-        DOMTCollection: HTMLTemplateElement,
-        DOMTCollItem: HTMLTemplateElement,
+        DFCollection: DocumentFragment,
     ) => HTMLElement}*/
     createDOMCollection(
         header,
         data,
         mediaType,
-        DOMTCollection,
-        DOMTCollItem,
+        DFCollection
     ) {
-        /**@type {HTMLTemplateElement}*/
-        var DOMClone = DOMTCollection.content.cloneNode(true);
         /**@type {HTMLElement}*/
-        var DOMCollection = DOMClone.firstElementChild;
+        var DOMCollection = DFCollection.children[1].cloneNode(true);
         //DOMCollection.children[0].insertAdjacentText("beforeend", header);
         var DOMTitle = DOMCollection.children[0]
         DOMTitle.insertAdjacentText("beforeend", header);
 
         for (var dataItem of data) {
             /**@type {HTMLButtonElement}*/
-            const DOMItem = DOMTCollItem.content.cloneNode(true).firstElementChild;
+            const DOMItem = DFCollection.children[2].cloneNode(true)
             DOMItem.setAttribute("data-id", dataItem.id);
             let itemTitle;
             /**@type {"movie"| "tv"} */
@@ -347,14 +349,73 @@ const View = {
 };
 
 const Modal = {
-    async open(DOMModal, typeMedia, id) {
-        var data = await API.get(typeMedia, id);
+    fragment: document.createDocumentFragment(),
+    /**@type {Array<string>}*/
+    buffer: [],
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOMModalItem: HTMLElement,
+        DFModal: DocumentFragment,
+    ) => Promise<undefined>}*/
+    async getCredit(mediaType, id, DOMModalItem, DFModal) {
+        var data = await API.getCredits(mediaType, id);
+        if (data === undefined) {
+            return;
+        }
+        var DOMCredits = DOMModalItem.children[3].lastElementChild;
+
+        var DOMTItem = DFModal.children[0];
+        var DOMTCDep = DFModal.children[1];
+        var DOMTCItem = DFModal.children[2];
+
+        var DOMCast = DOMTCItem.cloneNode(true);
+        DOMCast.firstElementChild.textContent = "Cast:"
+
+        for (var i = 0; i < data.cast.length; i += 1) {
+            var cast = data.cast[i];
+            var ItemClone = DOMTItem.cloneNode(false);
+            ItemClone.setAttribute("data-id", cast.id);
+            ItemClone.setAttribute("data-type", "11");
+            ItemClone.textContent = cast.name;
+            DOMCast.appendChild(ItemClone);
+        }
+        DOMCredits.appendChild(DOMCast);
+
+        var buf = Modal.buffer;
+        buf.length = 0;
+
+    },
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOM: DOM_T,
+    ) => Promise<undefined>}*/
+    async getData(mediaType, id, DOM) {
+        var data = await API.get(mediaType, id);
+        if (data === undefined) {
+            return;
+        }
         var DOMModalItem;
-        if (typeMedia === "tv") {
+        var DOMModal = DOM.modal;
+        var DOMTSec =  DOM.templateModal.content.children[2];
+        var DOMTItem = DOM.templateModal.content.children[0];
+        if (mediaType === "tv") {
             DOMModalItem = DOMModal.children[0];
             var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
-            var DOMTitle = DOMModalItem.children[2].children[1];
-            var DOMDescription = DOMModalItem.children[2].children[2];
+            var DOMTitle = DOMModalItem.children[3].children[0];
+            var DOMGenres = DOMModalItem.children[3].children[1];
+            var DOMDescription = DOMModalItem.children[3].children[2];
+            var DOMCredits = DOMModalItem.children[3].lastElementChild;
+
+            var DOMTItem = DOM.templateModal.content.children[0]
+            var DOMTP = document.createElement("span");
+
+            DOMTitle.textContent = data.name;
+            DOMDescription.textContent = data?.overview;
+
             if (data?.backdrop_path != null) {
                 DOMImg.setAttribute(
                     "src",
@@ -363,13 +424,72 @@ const Modal = {
                 DOMImg.setAttribute("alt", data.name);
                 DOMImg.setAttribute("data-display", "1");
             }
-            DOMTitle.textContent = data.name;
-            DOMDescription.textContent = data?.overview;
+
+            if (data.genres.length > 0) {
+                for (var genre of data.genres) {
+                    var DOMGenre = DOMTItem.cloneNode(true);
+                    DOMGenre.textContent = genre.name;
+                    DOMGenre.setAttribute("data-id", genre.id);
+                    DOMGenre.setAttribute("data-type", "10");
+                    Modal.fragment.appendChild(DOMGenre);
+                }
+                DOMGenres.appendChild(Modal.fragment);
+            }
+
+            if (data.spoken_languages.length > 0) {
+                var DOMLang = DOMTSec.cloneNode(true);
+                var DOMTP = document.createElement("span");
+                DOMLang.firstElementChild.textContent = "Languages:";
+                for (let i = 0; i < data.spoken_languages.length; i += 1) {
+                    var lang = data.spoken_languages[i];
+                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem.setAttribute("title", lang.english_name);
+                    if (lang.name.length > 0) {
+                        DOMItem.textContent = lang.name;
+                    } else {
+                        DOMItem.textContent = lang.english_name;
+                    }
+                    DOMLang.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMLang);
+            }
+            if (data.production_companies.length > 0) {
+                var DOMPC = DOMTSec.cloneNode(true);
+                DOMPC.firstElementChild.textContent = "Companies:";
+                for (var companies of data.production_companies) {
+                    var DOMItem = DOMTItem.cloneNode(true);
+                    DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                    DOMTItem.setAttribute("data-id", companies.id);
+                    DOMItem.textContent = companies.name;
+                    DOMPC.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMPC);
+            }
+            if (data.production_countries.length > 0) {
+                var DOMPC = DOMTSec.cloneNode(true);
+                DOMPC.firstElementChild.textContent = "Countries:";
+                for (var countries of data.production_countries) {
+                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem.textContent = countries.name;
+                    DOMPC.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMPC);
+            }
+
         } else {
-           DOMModalItem = DOMModal.children[1];
+            DOMModalItem = DOMModal.children[1];
             var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
-            var DOMTitle = DOMModalItem.children[2].children[1];
-            var DOMDescription = DOMModalItem.children[2].children[2];
+            var DOMTitle = DOMModalItem.children[3].children[0];
+            var DOMGenres = DOMModalItem.children[3].children[1];
+            var DOMDescription = DOMModalItem.children[3].children[2];
+            var DOMCredits = DOMModalItem.children[3].lastElementChild;
+
+            var DOMTItem = DOM.templateModal.content.children[0]
+            var DOMTP = document.createElement("span");
+
+            DOMTitle.textContent = data.title;
+            DOMDescription.textContent = data?.overview;
+
             if (data?.backdrop_path != null) {
                 DOMImg.setAttribute(
                     "src",
@@ -378,10 +498,109 @@ const Modal = {
                 DOMImg.setAttribute("alt", data.title);
                 DOMImg.setAttribute("data-display", "1");
             }
-            DOMTitle.textContent = data.title;
-            DOMDescription.textContent = data?.overview;
+
+            if (data.genres.length > 0) {
+                for (var genre of data.genres) {
+                    var DOMGenre = DOMTItem.cloneNode(true);
+                    DOMGenre.textContent = genre.name;
+                    DOMGenre.setAttribute("data-id", genre.id);
+                    DOMGenre.setAttribute("data-type", "10");
+                    Modal.fragment.appendChild(DOMGenre);
+                }
+                DOMGenres.appendChild(Modal.fragment);
+            }
+
+            if (data.spoken_languages.length > 0) {
+                var DOMLang = DOMTSec.cloneNode(true);
+                DOMLang.firstElementChild.textContent = "Languages:";
+                for (var lang of data.spoken_languages) {
+                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem.setAttribute("title", lang.english_name);
+                    if (lang.name.length > 0) {
+                        DOMItem.textContent = lang.name;
+                    } else {
+                        DOMItem.textContent = lang.english_name;
+                    }
+                    DOMLang.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMLang);
+            }
+
+            if (data.production_companies.length > 0) {
+                var DOMPC = DOMTSec.cloneNode(true);
+                DOMPC.firstElementChild.textContent = "Companies:";
+                for (var companies of data.production_companies) {
+                    var DOMItem = DOMTItem.cloneNode(true);
+                    DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                    DOMTItem.setAttribute("data-id", companies.id);
+                    DOMItem.textContent = companies.name;
+                    DOMPC.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMPC);
+            }
+
+            if (data.production_countries.length > 0) {
+                var DOMPC = DOMTSec.cloneNode(true);
+                DOMPC.firstElementChild.textContent = "Countries:";
+                for (var countries of data.production_countries) {
+                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem.textContent = countries.name;
+                    DOMPC.appendChild(DOMItem);
+                }
+                DOMCredits?.appendChild(DOMPC);
+            }
+
+            Modal.getCredit(mediaType, id, DOMModalItem, DOM.templateModal.content);
         }
         console.info(data);
+    },
+    /**
+    @type {(DOM: DOM_T) => undefined} */
+    close(DOM) {
+        var type = DOM.modal.getAttribute("data-select");
+        var DOMModalItem;
+        if (type === "tv") {
+            DOMModalItem = DOM.modal.children[0];
+        } else {
+            DOMModalItem = DOM.modal.children[1];
+        }
+        var DOMImg = DOMModalItem.children[1].firstElementChild?.firstElementChild;
+        var DOMTitle = DOMModalItem.children[3].children[0];
+        var DOMGenres = DOMModalItem.children[3].children[1];
+        var DOMDescription = DOMModalItem.children[3].children[2];
+
+        DOMModalItem.children[3].lastElementChild.replaceChildren();
+
+        DOMImg.setAttribute("data-display", "0");
+        DOMTitle.textContent = "";
+        DOMDescription.textContent = "";
+
+        DOMGenres.replaceChildren();
+        DOM.main.style.removeProperty("transform");
+        DOM.main.style.setProperty("position", "relative");
+
+        document.firstElementChild.scrollTop = View.topScroll;
+        DOM.modal.setAttribute("data-display", "0");
+    },
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOM: DOM_T,
+    ) => undefined}*/
+    open (mediaType, id, DOM) {
+        View.topScroll = document.firstElementChild.scrollTop;
+        document.firstElementChild.scrollTop = 0;
+
+        DOM.modal.setAttribute("data-display", "1");
+        DOM.modal.setAttribute("data-select", mediaType);
+
+        DOM.main.style.setProperty(
+            "transform",
+            `translateY(-${View.topScroll}px)`
+        );
+        DOM.main.style.setProperty("position", "fixed");
+        Modal.getData(mediaType, id, DOM);
     },
 };
 
@@ -395,9 +614,7 @@ async function discover(DataPromise, title, mediaType, i, base, DOM) {
         /*header*/          title,
         /*data*/            data.results,
         /*mediaType*/       mediaType,
-        /*DOMTCollection*/  DOM.templateCollection,
-        /*DOMTCollItem*/    DOM.templateCollItem,
-        /*DOMTIcon*/        DOM.templateIcons
+        /*DFCollection*/    DOM.templateCollection.content,
     );
     var DOMPos = DOM.view.children[base + i];
     DOMPos.insertAdjacentElement("beforebegin", DOMColl);
@@ -408,9 +625,8 @@ window.addEventListener("DOMContentLoaded", function () {
     var DOM = {
         //template
         templateCollection: document.getElementById("template_collection"),
-        templateCollSkeleton: document.getElementById("template_collection-skeleton"),
-        templateCollItem: document.getElementById("template_collection-item"),
         templateIcons: document.getElementById("template_icons"),
+        templateModal: document.getElementById("template_modal"),
         //header
         headerButtonNav: document.getElementById("header_button-nav"),
         headerNav: document.getElementById("header_nav"),
@@ -428,14 +644,11 @@ window.addEventListener("DOMContentLoaded", function () {
     if (DOM.templateCollection === null) {
         throw Error("DOM.templateCollection is null");
     }
-    if (DOM.templateCollSkeleton === null) {
-        throw Error("DOM.templateCollSkeleton is null");
-    }
-    if (DOM.templateCollItem === null) {
-        throw Error("DOM.templateCollItem is null");
-    }
     if (DOM.templateIcons === null) {
         throw Error("DOM.templateIcons is null");
+    }
+    if (DOM.templateModal === null) {
+        throw Error("DOM.templateModal is null");
     }
     if (DOM.headerButtonNav === null) {
         throw Error("DOM.headerButtonNav is null");
@@ -484,20 +697,7 @@ window.addEventListener("DOMContentLoaded", function () {
         } else if (type === TYPE.COLL_ITEM) {
             var mediaType = target?.getAttribute("data-media");
             var id = target?.getAttribute("data-id");
-
-            View.topScroll = document.firstElementChild.scrollTop;
-            document.firstElementChild.scrollTop = 0;
-
-            DOM.modal.setAttribute("data-display", "1");
-            DOM.modal.setAttribute("data-select", mediaType);
-
-            DOM.main.style.setProperty(
-                "transform",
-                `translateY(-${View.topScroll}px)`
-            );
-            DOM.main.style.setProperty("position", "fixed");
-
-            Modal.open(DOM.modal, mediaType, id);
+            Modal.open(mediaType, id, DOM);
         }
     });
 
@@ -506,20 +706,7 @@ window.addEventListener("DOMContentLoaded", function () {
         var id = target?.getAttribute("data-id");
         if (id !== undefined)  {
             var mediaType = target?.getAttribute("data-media");
-
-            View.topScroll = document.firstElementChild.scrollTop;
-            document.firstElementChild.scrollTop = 0;
-
-            DOM.modal.setAttribute("data-display", "1");
-            DOM.modal.setAttribute("data-select", mediaType);
-
-            DOM.main.style.setProperty(
-                "transform",
-                `translateY(-${View.topScroll}px)`
-            );
-            DOM.main.style.setProperty("position", "fixed");
-
-            Modal.open(DOM.modal, mediaType, id);
+            Modal.open(mediaType, id, DOM);
         }
     });
 
@@ -527,25 +714,7 @@ window.addEventListener("DOMContentLoaded", function () {
         var target = e.target;
         var type = target.getAttribute("data-type");
         if (type === TYPE.MODAL || type === TYPE.MODAL_CLOSE) {
-            DOM.modal.setAttribute("data-display", "0");
-            var type = DOM.modal.getAttribute("data-select");
-            var DOMModalItem;
-            if (type === "tv") {
-                DOMModalItem = DOM.modal.children[0];
-            } else {
-                DOMModalItem = DOM.modal.children[1];
-            }
-            var DOMImg = DOMModalItem.children[1].firstElementChild?.firstElementChild;
-            var DOMTitle = DOMModalItem.children[2].children[1];
-            var DOMDescription = DOMModalItem.children[2].children[2];
-            DOMImg.setAttribute("data-display", "0");
-            DOMTitle.textContent = "";
-            DOMDescription.textContent = "";
-
-            DOM.main.style.removeProperty("transform");
-            DOM.main.style.setProperty("position", "relative");
-
-            document.firstElementChild.scrollTop = View.topScroll;
+            Modal.close(DOM);
         }
     });
 
@@ -577,9 +746,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*header*/          "Week Trendings",
             /*data*/            data.results,
             /*mediaType*/       undefined,
-            /*DOMTCollection*/  DOM.templateCollection,
-            /*DOMTCollItem*/    DOM.templateCollItem,
-            /*DOMTIcon*/        DOM.templateIcons
+            /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos0 = DOM.view.children[0];
         DOMPos0.insertAdjacentElement("beforebegin", DOMColl);
@@ -595,9 +762,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*header*/          "Popular Movies",
             /*data*/            data.results,
             /*mediaType*/       "movie",
-            /*DOMTCollection*/  DOM.templateCollection,
-            /*DOMTCollItem*/    DOM.templateCollItem,
-            /*DOMTIcon*/        DOM.templateIcons
+            /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos1 = DOM.view.children[1];
         DOMPos1.insertAdjacentElement("beforebegin", DOMColl);
@@ -613,9 +778,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*header*/          "Popular Tv series",
             /*data*/            data.results,
             /*mediaType*/       "tv",
-            /*DOMTCollection*/  DOM.templateCollection,
-            /*DOMTCollItem*/    DOM.templateCollItem,
-            /*DOMTIcon*/        DOM.templateIcons
+            /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos2 = DOM.view.children[2];
         DOMPos2.insertAdjacentElement("beforebegin", DOMColl);
@@ -631,9 +794,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*header*/          "Top rated movie",
             /*data*/            data.results,
             /*mediaType*/       "movie",
-            /*DOMTCollection*/  DOM.templateCollection,
-            /*DOMTCollItem*/    DOM.templateCollItem,
-            /*DOMTIcon*/        DOM.templateIcons
+            /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos3 = DOM.view.children[3];
         DOMPos3.insertAdjacentElement("beforebegin", DOMColl);
@@ -649,9 +810,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*header*/          "Top rated tv serie",
             /*data*/            data.results,
             /*mediaType*/       "tv",
-            /*DOMTCollection*/  DOM.templateCollection,
-            /*DOMTCollItem*/    DOM.templateCollItem,
-            /*DOMTIcon*/        DOM.templateIcons
+            /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos4 = DOM.view.children[4];
         DOMPos4.insertAdjacentElement("beforebegin", DOMColl);
@@ -759,8 +918,11 @@ window.addEventListener("DOMContentLoaded", function () {
             full = true;
         }
         for (var i = CollectionState.count; i < end; i += 1) {
-            var DOMClone = DOM.templateCollSkeleton.content.cloneNode(true);
-            DOM.view?.appendChild(DOMClone);
+
+            var DOMSkeleton = (
+                DOM.templateCollection.content.children[0].cloneNode(true)
+            );
+            DOM.view?.appendChild(DOMSkeleton);
         }
 
         for (var i = CollectionState.count; i < end; i += 1) {

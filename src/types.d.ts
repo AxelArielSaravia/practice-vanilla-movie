@@ -2,6 +2,26 @@ type maybe<T> = T | undefined;
 
 type ThemeColor = ("light" | "dark");
 
+
+type DOM_T = {
+    templateCollection: HTMLTemplateElement,
+    templateIcons: HTMLTemplateElement,
+    templateModal: HTMLTemplateElement,
+    //header
+    headerButtonNav: HTMLButtonElement,
+    headerNav: HTMLElement,
+    headerButtonSearch: HTMLButtonElement,
+    headerButtonTheme: HTMLButtonElement,
+    //main
+    main: HTMLElement,
+    hero: HTMLElement,
+    view: HTMLElement,
+    buttonMore: HTMLButtonElement,
+
+    modal: HTMLElement,
+};
+
+
 type HeroItem = MBDTrendingItem
 
 type MDBResponse<T> = {
@@ -211,6 +231,37 @@ type MDBITv = {
     type: string,
     vote_average: number,
     vote_count: number
+};
+
+type MDBCredits = {
+    id: string,
+    cast: Array<{
+        adult: boolean,
+        cast_id: number,
+        character: string,
+        credit_id: string,
+        gender: number,
+        id: number,
+        known_for_department: string,
+        name: string,
+        order: number,
+        original_name: string,
+        popularity: number,
+        profile_path: string,
+    }>,
+    crew: Array<{
+        adult: boolean,
+        gender: number,
+        id: number,
+        known_for_department: string,
+        name: string,
+        original_name: string,
+        popularity: number,
+        profile_path: null | string,
+        credit_id: string,
+        department: string,
+        job: string
+    }>,
 };
 
 // Override

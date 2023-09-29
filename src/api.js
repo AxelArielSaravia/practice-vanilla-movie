@@ -96,6 +96,17 @@ const API = {
             fetch(`${window.location.origin}/api/${type}?id=${id}`)
             .then(fetchResolve)
         );
+    },
+    /**
+    @type {(
+        type: "movie" | "tv",
+        id: string
+    ) => Promise<maybe<MDBCredits>>} */
+    getCredits(type, id) {
+        return (
+            fetch(`${window.location.origin}/api/credits?type=${type}&id=${id}`)
+            .then(fetchResolve)
+        );
     }
 };
 

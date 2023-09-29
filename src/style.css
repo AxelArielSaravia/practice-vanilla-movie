@@ -957,16 +957,71 @@ footer a {
     opacity: 1;
 }
 
+.modal .item .type {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(10px, 10px);
+    background: var(--color-primary);
+    border-radius: var(--bradius-3);
+    padding: 3px 5px;
+}
+
 .modal .item .content {
     position: relative;
     z-index: 1;
-    padding: 0 30px;
-    margin-top: 20px;
+    padding: 0 30px 30px;
 }
 
-.modal .item .content h3 {
+
+.modal .item .content>h3 {
     font-size: 3rem;
 }
-.modal .item .content p {
+
+.modal .item .content .genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px 0;
+}
+
+.modal .item .content .genres .item {
+    background: var(--color-loading);
+    border-radius: var(--bradius-3);
+    padding: 3px 5px;
     font-size: 1.5rem;
 }
+
+.modal .item .content .description {
+    font-size: 1.5rem;
+    margin: 20px 0;
+}
+
+.modal .item .content .jobs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 0;
+}
+
+.modal .item .content .jobs .title {
+    font-size: 1.5rem;
+}
+.modal .item .content .jobs .item {
+    border-radius: var(--bradius-3);
+    border: 1px solid var(--color-secondary);
+    padding: 3px 5px;
+    font-size: 1.2rem;
+}
+.modal .item .content .jobs>span {
+    font-size: 1.5rem;
+    margin-right: 4px;
+}
+
+@media (hover: hover) {
+    .modal .item .content :is(.genres .item, .jobs .item):hover {
+        text-decoration: underline;
+    }
+}
+

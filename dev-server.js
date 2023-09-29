@@ -9,6 +9,7 @@ import genres   from "./api/genres.js";
 import toprated from "./api/toprated.js";
 import movie    from "./api/movie.js";
 import tv       from "./api/tv.js";
+import credits  from "./api/credits.js";
 
 const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 
@@ -78,6 +79,8 @@ Bun.serve({
                 return movie(req);
             } else if (reqPath.endsWith("tv")) {
                 return tv(req);
+            } else if (reqPath.endsWith("credits")) {
+                return credits(req);
             }
             return ResponseBad;
         } else {
