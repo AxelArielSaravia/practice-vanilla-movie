@@ -997,12 +997,22 @@ footer a {
     margin: 20px 0;
 }
 
+.modal .item .content .department {
+    margin-top: 20px;
+}
+.modal .item .content .department>h4 {
+    font-size: 1.8rem
+}
+
+.modal .item .content .department .jobs {
+    padding-left: 20px;
+}
 .modal .item .content .jobs {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 5px;
-    padding: 5px 0;
+    padding-block: 10px;
 }
 
 .modal .item .content .jobs .title {
@@ -1016,7 +1026,7 @@ footer a {
 }
 .modal .item .content .jobs>span {
     font-size: 1.5rem;
-    margin-right: 4px;
+    margin-right: 10px;
 }
 
 @media (hover: hover) {
@@ -1024,4 +1034,3 @@ footer a {
         text-decoration: underline;
     }
 }
-

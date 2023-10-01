@@ -233,6 +233,21 @@ type MDBITv = {
     vote_count: number
 };
 
+
+type MDBCrew = Array<{
+    adult: boolean,
+    gender: number,
+    id: number,
+    known_for_department: string,
+    name: string,
+    original_name: string,
+    popularity: number,
+    profile_path: null | string,
+    credit_id: string,
+    department: string,
+    job: string,
+}>;
+
 type MDBCredits = {
     id: string,
     cast: Array<{
@@ -249,19 +264,7 @@ type MDBCredits = {
         popularity: number,
         profile_path: string,
     }>,
-    crew: Array<{
-        adult: boolean,
-        gender: number,
-        id: number,
-        known_for_department: string,
-        name: string,
-        original_name: string,
-        popularity: number,
-        profile_path: null | string,
-        credit_id: string,
-        department: string,
-        job: string
-    }>,
+    crew: MDBCrew,
 };
 
 // Override

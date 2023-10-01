@@ -89,24 +89,26 @@ const API = {
     /**
     @type {(
         type: "movie" | "tv",
-        id: string
+        id: string,
+        option: undefined | {signal: AbortSignal}
     ) => Promise<maybe<MDBIMovie | MDBITv>>} */
-    get(type, id) {
+    get(type, id, option) {
         return (
-            fetch(`${window.location.origin}/api/${type}?id=${id}`)
+            fetch(`${window.location.origin}/api/${type}?id=${id}`, option)
             .then(fetchResolve)
         );
     },
     /**
     @type {(
         type: "movie" | "tv",
-        id: string
+        id: string,
+        option: undefined | {signal: AbortSignal}
     ) => Promise<maybe<MDBCredits>>} */
-    getCredits(type, id) {
-        return (
-            fetch(`${window.location.origin}/api/credits?type=${type}&id=${id}`)
-            .then(fetchResolve)
-        );
+    getCredits(type, id, option) {
+        return fetch(
+            `${window.location.origin}/api/credits?type=${type}&id=${id}`,
+            option
+        ).then(fetchResolve);
     }
 };
 

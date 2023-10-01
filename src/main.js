@@ -25,7 +25,16 @@ const TYPE = {
     MODAL_GENRE: "10",
     /**
     @type {"11"} */
-    MODAL_COMPANY: "11",
+    MODAL_LANG: "11",
+    /**
+    @type {"12"} */
+    MODAL_COMPANY: "12",
+    /**
+    @type {"13"} */
+    MODAL_COUNTRY: "13",
+    /**
+    @type {"14"} */
+    MODAL_CAST: "14",
 };
 
 const CollectionState = {
@@ -348,19 +357,73 @@ const View = {
     }
 };
 
+var ABORT = new AbortController();
+var FETCH_OPT = {
+    signal: ABORT.signal
+};
+/**
+@type {(msg: string) => undefined} */
+function abortFetch(msg) {
+    ABORT.abort(msg);
+    ABORT = new AbortController();
+    FETCH_OPT.signal = ABORT.signal;
+}
+
 const Modal = {
     fragment: document.createDocumentFragment(),
-    /**@type {Array<string>}*/
-    buffer: [],
+    dataLoaded: false,
+    creditsLoaded: false,
+    /**
+    @type {(arr: MDBCrew) => number}*/
+    orderCredit(arr) {
+        if (arr.length < 2) {
+            return arr.length;
+        }
+        var fst = 0;
+        var lst = 0;
+        var mid = 0;
+        var len = 1;
+        for (var k = 1; k < arr.length; k += 1) {
+            var target = arr[k];
+            if (target.department !== "Crew") {
+                while (fst <= lst) {
+                    if (fst < lst) {
+                        mid = Math.floor((fst + lst) / 2);
+                    } else {
+                        mid = fst;
+                    }
+                    if (target.department < arr[mid].department) {
+                        lst = mid - 1;
+                    } else if (target.department > arr[mid].department) {
+                        fst = mid + 1;
+                    } else {
+                        if (target.job < arr[mid].job) {
+                            lst = mid - 1;
+                        } else {
+                            fst = mid + 1;
+                        }
+                    }
+                }
+                if (fst !== len) {
+                    arr.copyWithin(fst + 1, fst, len);
+                }
+                arr[fst] = target;
+                fst = 0;
+                lst = len;
+                len += 1;
+            }
+        }
+        return len;
+    },
     /**
     @type {(
         mediaType: "tv" | "movie",
         id: string,
         DOMModalItem: HTMLElement,
         DFModal: DocumentFragment,
-    ) => Promise<undefined>}*/
+    ) => Promise<undefined>} */
     async getCredit(mediaType, id, DOMModalItem, DFModal) {
-        var data = await API.getCredits(mediaType, id);
+        var data = await API.getCredits(mediaType, id, FETCH_OPT);
         if (data === undefined) {
             return;
         }
@@ -368,24 +431,81 @@ const Modal = {
 
         var DOMTItem = DFModal.children[0];
         var DOMTCDep = DFModal.children[1];
-        var DOMTCItem = DFModal.children[2];
+        var DOMTCJob = DFModal.children[2];
+        var DOMTSpan = DFModal.children[3];
 
-        var DOMCast = DOMTCItem.cloneNode(true);
-        DOMCast.firstElementChild.textContent = "Cast:"
+        var DOMDepart;
+        var DOMItem;
+        var DOMJob;
+        if (data.cast.length > 0) {
+            DOMJob = DOMTCJob.cloneNode(true);
+            DOMJob.firstElementChild.textContent = "Cast:"
 
-        for (var i = 0; i < data.cast.length; i += 1) {
-            var cast = data.cast[i];
-            var ItemClone = DOMTItem.cloneNode(false);
-            ItemClone.setAttribute("data-id", cast.id);
-            ItemClone.setAttribute("data-type", "11");
-            ItemClone.textContent = cast.name;
-            DOMCast.appendChild(ItemClone);
+            for (var i = 0; i < data.cast.length; i += 1) {
+                var cast = data.cast[i];
+                DOMItem = DOMTItem.cloneNode(false);
+                DOMItem.setAttribute("data-id", cast.id);
+                DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
+                DOMItem.textContent = cast.name;
+                DOMJob.appendChild(DOMItem);
+            }
+            DOMCredits.appendChild(DOMJob);
+
+            DOMJob = undefined;
         }
-        DOMCredits.appendChild(DOMCast);
-
-        var buf = Modal.buffer;
-        buf.length = 0;
-
+        if (data.crew.length > 0) {
+            var crews = data.crew;
+            var data_len = Modal.orderCredit(crews);
+            console.info(crews)
+            var department = "";
+            var job = "";
+            for (var j = 0; j < data_len; j += 1) {
+                var crew = crews[j];
+                if (crew.department !== department) {
+                    if (DOMDepart !== undefined) {
+                        if (DOMJob !== undefined) {
+                            DOMDepart?.appendChild(DOMJob);
+                            DOMJob = undefined;
+                        }
+                        Modal.fragment.appendChild(DOMDepart);
+                    }
+                    department = crew.department;
+                    DOMDepart = DOMTCDep.cloneNode(true);
+                    DOMDepart.firstElementChild.textContent = department;
+                }
+                if (crew.job !== job) {
+                    if (DOMJob !== undefined) {
+                        DOMDepart?.appendChild(DOMJob);
+                    }
+                    job = crew.job;
+                    DOMJob = DOMTCJob.cloneNode(true);
+                    DOMJob.firstElementChild.textContent = `${job}:`;
+                }
+                if (
+                    department === "Directing"
+                    && (
+                        job === "Director"
+                        || job === "Series Director"
+                    )
+                ) {
+                    DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem.setAttribute("data-id", crew.id);
+                    DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
+                } else {
+                    DOMItem = DOMTSpan.cloneNode(false);
+                }
+                DOMItem.textContent = crew.name;
+                DOMJob.appendChild(DOMItem)
+            }
+            if (DOMDepart !== undefined) {
+                if (DOMJob !== undefined) {
+                    DOMDepart?.appendChild(DOMJob);
+                }
+                Modal.fragment.appendChild(DOMDepart);
+            }
+            DOMCredits?.appendChild(Modal.fragment);
+        }
+        Modal.creditsLoaded = true;
     },
     /**
     @type {(
@@ -394,7 +514,7 @@ const Modal = {
         DOM: DOM_T,
     ) => Promise<undefined>}*/
     async getData(mediaType, id, DOM) {
-        var data = await API.get(mediaType, id);
+        var data = await API.get(mediaType, id, FETCH_OPT);
         if (data === undefined) {
             return;
         }
@@ -411,7 +531,8 @@ const Modal = {
             var DOMCredits = DOMModalItem.children[3].lastElementChild;
 
             var DOMTItem = DOM.templateModal.content.children[0]
-            var DOMTP = document.createElement("span");
+            var DOMTSpan = DOM.templateModal.content.children[3]
+            var DOMItem;
 
             DOMTitle.textContent = data.name;
             DOMDescription.textContent = data?.overview;
@@ -427,23 +548,34 @@ const Modal = {
 
             if (data.genres.length > 0) {
                 for (var genre of data.genres) {
-                    var DOMGenre = DOMTItem.cloneNode(true);
-                    DOMGenre.textContent = genre.name;
-                    DOMGenre.setAttribute("data-id", genre.id);
-                    DOMGenre.setAttribute("data-type", "10");
-                    Modal.fragment.appendChild(DOMGenre);
+                    DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem.textContent = genre.name;
+                    DOMItem.setAttribute("data-id", genre.id);
+                    DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
+                    Modal.fragment.appendChild(DOMItem);
                 }
                 DOMGenres.appendChild(Modal.fragment);
             }
 
+            var DOMPopularity = DOMTSec.cloneNode(true);
+            DOMPopularity.firstElementChild.textContent = "Popularity:";
+            DOMItem = DOMTSpan.cloneNode(true);
+            DOMItem.textContent = String(data.popularity);
+            DOMPopularity.appendChild(DOMItem);
+            DOMCredits?.appendChild(DOMPopularity);
+
+            var DOMDate = DOMTSec.cloneNode(true);
+            DOMDate.firstElementChild.textContent = "First Air Date:";
+            DOMItem = DOMTSpan.cloneNode(true);
+            DOMItem.textContent = data.first_air_date;
+            DOMDate.appendChild(DOMItem);
+            DOMCredits.appendChild(DOMDate);
+
             if (data.spoken_languages.length > 0) {
                 var DOMLang = DOMTSec.cloneNode(true);
-                var DOMTP = document.createElement("span");
                 DOMLang.firstElementChild.textContent = "Languages:";
-                for (let i = 0; i < data.spoken_languages.length; i += 1) {
-                    var lang = data.spoken_languages[i];
-                    var DOMItem = DOMTP.cloneNode(true);
-                    DOMItem.setAttribute("title", lang.english_name);
+                for (var lang of data.spoken_languages) {
+                    DOMItem = DOMTSpan.cloneNode(true);
                     if (lang.name.length > 0) {
                         DOMItem.textContent = lang.name;
                     } else {
@@ -453,11 +585,12 @@ const Modal = {
                 }
                 DOMCredits?.appendChild(DOMLang);
             }
+
             if (data.production_companies.length > 0) {
                 var DOMPC = DOMTSec.cloneNode(true);
                 DOMPC.firstElementChild.textContent = "Companies:";
                 for (var companies of data.production_companies) {
-                    var DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem = DOMTItem.cloneNode(true);
                     DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
                     DOMTItem.setAttribute("data-id", companies.id);
                     DOMItem.textContent = companies.name;
@@ -465,17 +598,17 @@ const Modal = {
                 }
                 DOMCredits?.appendChild(DOMPC);
             }
+
             if (data.production_countries.length > 0) {
                 var DOMPC = DOMTSec.cloneNode(true);
                 DOMPC.firstElementChild.textContent = "Countries:";
                 for (var countries of data.production_countries) {
-                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem = DOMTSpan.cloneNode(true);
                     DOMItem.textContent = countries.name;
                     DOMPC.appendChild(DOMItem);
                 }
                 DOMCredits?.appendChild(DOMPC);
             }
-
         } else {
             DOMModalItem = DOMModal.children[1];
             var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
@@ -485,7 +618,8 @@ const Modal = {
             var DOMCredits = DOMModalItem.children[3].lastElementChild;
 
             var DOMTItem = DOM.templateModal.content.children[0]
-            var DOMTP = document.createElement("span");
+            var DOMTSpan = DOM.templateModal.content.children[3]
+            var DOMItem;
 
             DOMTitle.textContent = data.title;
             DOMDescription.textContent = data?.overview;
@@ -501,21 +635,34 @@ const Modal = {
 
             if (data.genres.length > 0) {
                 for (var genre of data.genres) {
-                    var DOMGenre = DOMTItem.cloneNode(true);
-                    DOMGenre.textContent = genre.name;
-                    DOMGenre.setAttribute("data-id", genre.id);
-                    DOMGenre.setAttribute("data-type", "10");
-                    Modal.fragment.appendChild(DOMGenre);
+                    DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem.textContent = genre.name;
+                    DOMItem.setAttribute("data-id", genre.id);
+                    DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
+                    Modal.fragment.appendChild(DOMItem);
                 }
                 DOMGenres.appendChild(Modal.fragment);
             }
+
+            var DOMPopularity = DOMTSec.cloneNode(true);
+            DOMPopularity.firstElementChild.textContent = "Popularity:";
+            DOMItem = DOMTSpan.cloneNode(true);
+            DOMItem.textContent = String(data.popularity);
+            DOMPopularity.appendChild(DOMItem);
+            DOMCredits?.appendChild(DOMPopularity);
+
+            var DOMDate = DOMTSec.cloneNode(true);
+            DOMDate.firstElementChild.textContent = "Release Date:";
+            DOMItem = DOMTSpan.cloneNode(true);
+            DOMItem.textContent = data.release_date;
+            DOMDate.appendChild(DOMItem);
+            DOMCredits?.appendChild(DOMDate);
 
             if (data.spoken_languages.length > 0) {
                 var DOMLang = DOMTSec.cloneNode(true);
                 DOMLang.firstElementChild.textContent = "Languages:";
                 for (var lang of data.spoken_languages) {
-                    var DOMItem = DOMTP.cloneNode(true);
-                    DOMItem.setAttribute("title", lang.english_name);
+                    DOMItem = DOMTSpan.cloneNode(true);
                     if (lang.name.length > 0) {
                         DOMItem.textContent = lang.name;
                     } else {
@@ -530,7 +677,7 @@ const Modal = {
                 var DOMPC = DOMTSec.cloneNode(true);
                 DOMPC.firstElementChild.textContent = "Companies:";
                 for (var companies of data.production_companies) {
-                    var DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem = DOMTItem.cloneNode(true);
                     DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
                     DOMTItem.setAttribute("data-id", companies.id);
                     DOMItem.textContent = companies.name;
@@ -543,20 +690,31 @@ const Modal = {
                 var DOMPC = DOMTSec.cloneNode(true);
                 DOMPC.firstElementChild.textContent = "Countries:";
                 for (var countries of data.production_countries) {
-                    var DOMItem = DOMTP.cloneNode(true);
+                    DOMItem = DOMTSpan.cloneNode(true);
                     DOMItem.textContent = countries.name;
                     DOMPC.appendChild(DOMItem);
                 }
                 DOMCredits?.appendChild(DOMPC);
             }
 
-            Modal.getCredit(mediaType, id, DOMModalItem, DOM.templateModal.content);
         }
+        Modal.getCredit(
+            mediaType,
+            id,
+            DOMModalItem,
+            DOM.templateModal.content
+        );
+        Modal.dataLoaded = true;
         console.info(data);
     },
     /**
     @type {(DOM: DOM_T) => undefined} */
     close(DOM) {
+        if (!Modal.dataLoaded || !Modal.creditsLoaded) {
+            abortFetch("Close Modal");
+        }
+        Modal.dataLoaded = false;
+        Modal.creditsLoaded = false;
         var type = DOM.modal.getAttribute("data-select");
         var DOMModalItem;
         if (type === "tv") {
@@ -603,6 +761,7 @@ const Modal = {
         Modal.getData(mediaType, id, DOM);
     },
 };
+
 
 async function discover(DataPromise, title, mediaType, i, base, DOM) {
     var data = await DataPromise;
