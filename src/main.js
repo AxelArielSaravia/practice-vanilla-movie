@@ -366,7 +366,7 @@ function abortFetch(msg) {
 }
 
 const Modal = {
-    MAX_SIMILAR: 5,
+    MAX_SIMILAR: 4,
     fragment: document.createDocumentFragment(),
     creditsLoaded: false,
     dataLoaded: false,
@@ -497,7 +497,7 @@ const Modal = {
         if (results != null && 0 < results.length) {
             DOMSimilar.setAttribute("data-display", "1");
             var i = 0;
-            while (i < results.length && i <= Modal.MAX_SIMILAR) {
+            while (i < results.length && i < Modal.MAX_SIMILAR) {
                 var dataItem = results[i];
                 var DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.setAttribute("data-id", dataItem.id);
@@ -1006,7 +1006,6 @@ window.addEventListener("DOMContentLoaded", function () {
         } else if (type === TYPE.COLL_ITEM) {
             Modal.close(DOM);
             var mediaType = target?.getAttribute("data-media");
-            var id = target?.getAttribute("data-id");
             Modal.open(mediaType, id, DOM);
         }
     });
