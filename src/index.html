@@ -262,7 +262,7 @@
         data-display="0"
         data-select="tv"
     >
-        <article class="item tv">
+        <article class="data tv">
             <button class="close" data-type="9">
                 <svg
                     class="icon icon-x"
@@ -286,14 +286,21 @@
             </div>
             <h3 class="type">TV Serie</h3>
             <div class="content">
-                <h3></h3>
-                <div class="genres"></div>
-                <p class="description"></p>
-                <section class=""></section>
-                <section class="credits"></section>
+                <h3 data-loading="1"></h3>
+                <div class="genres" data-loading="1"></div>
+                <p class="duration"></p>
+                <p class="description" data-loading="1"></p>
+                <section class="primary-data" data-loading="1"></section>
+                <section class="cast" data-loading="1"></section>
+                <section class="season" data-loading="1"></section>
+                <section class="similars" data-display="0" data-loading="1">
+                    <h3>Similar TV Series</h3>
+                    <div></div>
+                </section>
+                <section class="credits" data-loading="1"></section>
             </div>
         </article>
-        <article class="item movie">
+        <article class="data movie">
             <button class="close" data-type="9">
                 <svg
                     class="icon icon-x"
@@ -317,10 +324,17 @@
             </div>
             <h3 class="type">Movie</h3>
             <div class="content">
-                <h3></h3>
-                <div class="genres"></div>
-                <p class="description"></p>
-                <section class="credits"></section>
+                <h3 data-loading="1"></h3>
+                <div class="genres" data-loading="1"></div>
+                <p class="duration"></p>
+                <p class="description" data-loading="1"></p>
+                <section class="primary-data" data-loading="1"></section>
+                <section class="cast" data-loading="1"></section>
+                <section class="similars" data-display="0" data-loading="1">
+                    <h3>Similar Movies</h3>
+                    <div></div>
+                </section>
+                <section class="credits" data-loading="1"></section>
             </div>
         </article>
     </div>
@@ -408,7 +422,7 @@
     </template>
     <template id="template_modal">
     <!--0 Item-->
-        <button class="item" data-id="" data-type=""></button>
+        <a class="item" href="" data-id="" data-type=""></a>
     <!--1 Credits Department-->
         <section class="department">
             <h4></h4>
@@ -418,8 +432,27 @@
             <h5 class="title"></h5>
         </section>
     <!--3 Credits Item-->
-        <span></span>
+        <span class="text"></span>
+    <!--4 more-->
+        <button class="more"></button>
+    <!--5 similar-->
+        <button class="similar" data-id="" data-type="6" data-media="">
+            <img alt="" src="" data-display="1" loading="lazy">
+            <svg
+                class="icon icon-video"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+            <h3 data-opacity="0"></h3>
+        </button>
     </template>
-    <template id="template_icons"></template>
 </body>
 </html>

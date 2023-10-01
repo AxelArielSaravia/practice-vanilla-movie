@@ -90,13 +90,15 @@ const API = {
     @type {(
         type: "movie" | "tv",
         id: string,
+        similar: boolean,
         option: undefined | {signal: AbortSignal}
     ) => Promise<maybe<MDBIMovie | MDBITv>>} */
-    get(type, id, option) {
-        return (
-            fetch(`${window.location.origin}/api/${type}?id=${id}`, option)
-            .then(fetchResolve)
-        );
+    get(type, id, similar, option) {
+        var url = `${window.location.origin}/api/${type}?id=${id}`;
+        if (similar) {
+            url += "&similar"
+        }
+        return fetch(url, option).then(fetchResolve);
     },
     /**
     @type {(

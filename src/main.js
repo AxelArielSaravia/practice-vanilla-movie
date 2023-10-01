@@ -25,16 +25,13 @@ const TYPE = {
     MODAL_GENRE: "10",
     /**
     @type {"11"} */
-    MODAL_LANG: "11",
+    MODAL_COMPANY: "11",
     /**
     @type {"12"} */
-    MODAL_COMPANY: "12",
+    MODAL_CAST: "12",
     /**
     @type {"13"} */
-    MODAL_COUNTRY: "13",
-    /**
-    @type {"14"} */
-    MODAL_CAST: "14",
+    MODAL_C_MORE: "13",
 };
 
 const CollectionState = {
@@ -106,7 +103,6 @@ const NavMethods = {
     SHOW: "1",
     //Toggle nav menu on header_button-nav onclick
     buttonNavOnclick(e) {
-        console.info(e);
         /**@type {HTMLButtonElement}*///This will crash if is null
         var DOMButtonNav = e.currentTarget;
         /**@type {HTMLUListElement}*///This will crash if is null
@@ -320,13 +316,13 @@ const View = {
     ) {
         /**@type {HTMLElement}*/
         var DOMCollection = DFCollection.children[1].cloneNode(true);
+        var DOMTItem = DFCollection.children[2];
         //DOMCollection.children[0].insertAdjacentText("beforeend", header);
         var DOMTitle = DOMCollection.children[0]
         DOMTitle.insertAdjacentText("beforeend", header);
-
         for (var dataItem of data) {
             /**@type {HTMLButtonElement}*/
-            const DOMItem = DFCollection.children[2].cloneNode(true)
+            const DOMItem = DOMTItem.cloneNode(true)
             DOMItem.setAttribute("data-id", dataItem.id);
             let itemTitle;
             /**@type {"movie"| "tv"} */
@@ -370,12 +366,89 @@ function abortFetch(msg) {
 }
 
 const Modal = {
+    MAX_SIMILAR: 5,
     fragment: document.createDocumentFragment(),
-    dataLoaded: false,
     creditsLoaded: false,
+    dataLoaded: false,
+    similarLoaded: false,
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOMModalData: HTMLElement,
+        DFModal: DocumentFragment,
+    ) => Promise<undefined>} */
+    async getCredit(mediaType, id, DOMModalData, DFModal) {
+        var data = await API.getCredits(mediaType, id, FETCH_OPT);
+        console.info("credits:", data);
+        if (data === undefined) {
+            return;
+        }
+        Modal.DOMMCreditsFill(data, DOMModalData, DFModal);
+        Modal.creditsLoaded = true;
+    },
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOM: DOM_T,
+    ) => Promise<undefined>}*/
+    async getData(mediaType, id, DOM) {
+        var data = await API.get(mediaType, id, false, FETCH_OPT);
+        console.info("data:", data);
+        if (data === undefined) {
+            return;
+        }
+        if (mediaType === "tv") {
+            Modal.DOMMTvFill(data, DOM);
+            Modal.getCredit(
+                mediaType,
+                id,
+                DOM.modal.children[0],
+                DOM.templateModal.content
+            );
+            Modal.getSimilar(
+                mediaType,
+                id,
+                DOM.modal.children[0],
+                DOM.templateModal.content
+            );
+        } else {
+            Modal.DOMMMovieFill(data, DOM)
+            Modal.getCredit(
+                mediaType,
+                id,
+                DOM.modal.children[1],
+                DOM.templateModal.content
+            );
+            Modal.getSimilar(
+                mediaType,
+                id,
+                DOM.modal.children[1],
+                DOM.templateModal.content
+            );
+        }
+        Modal.dataLoaded = true;
+    },
+    /**
+    @type {(
+        mediaType: "tv" | "movie",
+        id: string,
+        DOMModalData: HTMLElement,
+        DFModal: DocumentFragment,
+    ) => Promise<undefined>}*/
+    async getSimilar(mediaType, id, DOMModalData, DFModal) {
+        var data = await API.get(mediaType, id, true, FETCH_OPT);
+        console.info("similars:",data);
+        if (data === undefined) {
+            return;
+        }
+        Modal.DOMMSimilarFill(data, mediaType, DOMModalData, DFModal)
+        Modal.similarLoaded = true;
+    },
     /**
     @type {(arr: MDBCrew) => number}*/
-    orderCredit(arr) {
+    orderCredits(arr) {
         if (arr.length < 2) {
             return arr.length;
         }
@@ -415,48 +488,90 @@ const Modal = {
         }
         return len;
     },
-    /**
-    @type {(
-        mediaType: "tv" | "movie",
-        id: string,
-        DOMModalItem: HTMLElement,
-        DFModal: DocumentFragment,
-    ) => Promise<undefined>} */
-    async getCredit(mediaType, id, DOMModalItem, DFModal) {
-        var data = await API.getCredits(mediaType, id, FETCH_OPT);
-        if (data === undefined) {
-            return;
+    DOMMSimilarFill(data, mediaType, DOMModalData, DFModal) {
+        var dmdcLen = DOMModalData.children[3].children.length;
+        var DOMSimilar = DOMModalData.children[3].children[dmdcLen - 2];
+        var DOMContainer = DOMSimilar.lastElementChild;
+        var DOMTItem = DFModal.children[5];
+        var results = data.results
+        if (results != null && 0 < results.length) {
+            DOMSimilar.setAttribute("data-display", "1");
+            var i = 0;
+            while (i < results.length && i <= Modal.MAX_SIMILAR) {
+                var dataItem = results[i];
+                var DOMItem = DOMTItem.cloneNode(true);
+                DOMItem.setAttribute("data-id", dataItem.id);
+                let itemTitle;
+                /**@type {"movie"| "tv"} */
+                if (mediaType === "movie") {
+                    itemTitle = dataItem.title;
+                } else {
+                    itemTitle = dataItem.name;
+                }
+                DOMItem.setAttribute("title", itemTitle);
+                DOMItem.setAttribute("data-media", mediaType);
+                var DOMImg = DOMItem.firstElementChild;
+                var DOMH3 = DOMItem.lastElementChild;
+
+                DOMImg.setAttribute("alt", itemTitle);
+                DOMH3.insertAdjacentText("beforeend", itemTitle);
+
+                if (dataItem.poster_path != null && dataItem.poster_path.length > 0) {
+                    DOMImg.setAttribute(
+                        "src",
+                        `https://image.tmdb.org/t/p/w200${dataItem.poster_path}`
+                    );
+                } else {
+                    DOMImg.setAttribute("data-display", "0");
+                    DOMH3.setAttribute("data-opacity", "1");
+                }
+                Modal.fragment.appendChild(DOMItem);
+                i += 1;
+            }
+            DOMContainer.appendChild(Modal.fragment);
         }
-        var DOMCredits = DOMModalItem.children[3].lastElementChild;
+    },
+    DOMMCreditsFill(data, DOMModalData, DFModal) {
+        var DOMCast = DOMModalData.children[3].children[5];
+        var DOMCredits = DOMModalData.children[3].lastElementChild;
 
         var DOMTItem = DFModal.children[0];
         var DOMTCDep = DFModal.children[1];
         var DOMTCJob = DFModal.children[2];
         var DOMTSpan = DFModal.children[3];
+        var DOMTButton = DFModal.children[4];
 
         var DOMDepart;
         var DOMItem;
         var DOMJob;
-        if (data.cast.length > 0) {
+        var casts = data.cast;
+        if (casts.length > 0) {
             DOMJob = DOMTCJob.cloneNode(true);
+            DOMJob.setAttribute("data-more", "0");
             DOMJob.firstElementChild.textContent = "Cast:"
 
-            for (var i = 0; i < data.cast.length; i += 1) {
-                var cast = data.cast[i];
+            for (var i = 0; i < casts.length; i += 1) {
+                var cast = casts[i];
                 DOMItem = DOMTItem.cloneNode(false);
                 DOMItem.setAttribute("data-id", cast.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
                 DOMItem.textContent = cast.name;
                 DOMJob.appendChild(DOMItem);
             }
-            DOMCredits.appendChild(DOMJob);
+            if (casts.length > 3) {
+                var DOMBut = DOMTButton.cloneNode(false);
+                DOMBut.setAttribute("class", "more");
+                DOMBut.setAttribute("data-type", TYPE.MODAL_C_MORE);
+                DOMBut.textContent = "more";
+                DOMJob.appendChild(DOMBut);
+            }
+            DOMCast.appendChild(DOMJob);
 
             DOMJob = undefined;
         }
         if (data.crew.length > 0) {
             var crews = data.crew;
-            var data_len = Modal.orderCredit(crews);
-            console.info(crews)
+            var data_len = Modal.orderCredits(crews);
             var department = "";
             var job = "";
             for (var j = 0; j < data_len; j += 1) {
@@ -486,6 +601,7 @@ const Modal = {
                     && (
                         job === "Director"
                         || job === "Series Director"
+                        || job === "Action Director"
                     )
                 ) {
                     DOMItem = DOMTItem.cloneNode(true);
@@ -505,213 +621,225 @@ const Modal = {
             }
             DOMCredits?.appendChild(Modal.fragment);
         }
-        Modal.creditsLoaded = true;
     },
     /**
-    @type {(
-        mediaType: "tv" | "movie",
-        id: string,
-        DOM: DOM_T,
-    ) => Promise<undefined>}*/
-    async getData(mediaType, id, DOM) {
-        var data = await API.get(mediaType, id, FETCH_OPT);
-        if (data === undefined) {
-            return;
-        }
-        var DOMModalItem;
+    @type {(data: MDBIMovie, DOM: DOM_T) => undefined} */
+    DOMMMovieFill(data, DOM) {
         var DOMModal = DOM.modal;
         var DOMTSec =  DOM.templateModal.content.children[2];
         var DOMTItem = DOM.templateModal.content.children[0];
-        if (mediaType === "tv") {
-            DOMModalItem = DOMModal.children[0];
-            var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
-            var DOMTitle = DOMModalItem.children[3].children[0];
-            var DOMGenres = DOMModalItem.children[3].children[1];
-            var DOMDescription = DOMModalItem.children[3].children[2];
-            var DOMCredits = DOMModalItem.children[3].lastElementChild;
+        var DOMModalItem = DOMModal.children[1];
 
-            var DOMTItem = DOM.templateModal.content.children[0]
-            var DOMTSpan = DOM.templateModal.content.children[3]
-            var DOMItem;
+        var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
 
-            DOMTitle.textContent = data.name;
-            DOMDescription.textContent = data?.overview;
+        var DOMContent = DOMModalItem.children[3];
+        var DOMTitle = DOMContent.children[0];
+        var DOMGenres = DOMContent.children[1];
+        var DOMDuration = DOMContent.children[2];
+        var DOMDescription = DOMContent.children[3];
+        var DOMPData = DOMContent.children[4]
 
-            if (data?.backdrop_path != null) {
-                DOMImg.setAttribute(
-                    "src",
-                    `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
-                );
-                DOMImg.setAttribute("alt", data.name);
-                DOMImg.setAttribute("data-display", "1");
-            }
+        var DOMTItem = DOM.templateModal.content.children[0]
+        var DOMTSpan = DOM.templateModal.content.children[3]
+        var DOMTButton = DOM.templateModal.content.children[4]
 
-            if (data.genres.length > 0) {
-                for (var genre of data.genres) {
-                    DOMItem = DOMTItem.cloneNode(true);
-                    DOMItem.textContent = genre.name;
-                    DOMItem.setAttribute("data-id", genre.id);
-                    DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
-                    Modal.fragment.appendChild(DOMItem);
-                }
-                DOMGenres.appendChild(Modal.fragment);
-            }
+        var DOMItem;
 
-            var DOMPopularity = DOMTSec.cloneNode(true);
-            DOMPopularity.firstElementChild.textContent = "Popularity:";
-            DOMItem = DOMTSpan.cloneNode(true);
-            DOMItem.textContent = String(data.popularity);
-            DOMPopularity.appendChild(DOMItem);
-            DOMCredits?.appendChild(DOMPopularity);
-
-            var DOMDate = DOMTSec.cloneNode(true);
-            DOMDate.firstElementChild.textContent = "First Air Date:";
-            DOMItem = DOMTSpan.cloneNode(true);
-            DOMItem.textContent = data.first_air_date;
-            DOMDate.appendChild(DOMItem);
-            DOMCredits.appendChild(DOMDate);
-
-            if (data.spoken_languages.length > 0) {
-                var DOMLang = DOMTSec.cloneNode(true);
-                DOMLang.firstElementChild.textContent = "Languages:";
-                for (var lang of data.spoken_languages) {
-                    DOMItem = DOMTSpan.cloneNode(true);
-                    if (lang.name.length > 0) {
-                        DOMItem.textContent = lang.name;
-                    } else {
-                        DOMItem.textContent = lang.english_name;
-                    }
-                    DOMLang.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMLang);
-            }
-
-            if (data.production_companies.length > 0) {
-                var DOMPC = DOMTSec.cloneNode(true);
-                DOMPC.firstElementChild.textContent = "Companies:";
-                for (var companies of data.production_companies) {
-                    DOMItem = DOMTItem.cloneNode(true);
-                    DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
-                    DOMTItem.setAttribute("data-id", companies.id);
-                    DOMItem.textContent = companies.name;
-                    DOMPC.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMPC);
-            }
-
-            if (data.production_countries.length > 0) {
-                var DOMPC = DOMTSec.cloneNode(true);
-                DOMPC.firstElementChild.textContent = "Countries:";
-                for (var countries of data.production_countries) {
-                    DOMItem = DOMTSpan.cloneNode(true);
-                    DOMItem.textContent = countries.name;
-                    DOMPC.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMPC);
-            }
-        } else {
-            DOMModalItem = DOMModal.children[1];
-            var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
-            var DOMTitle = DOMModalItem.children[3].children[0];
-            var DOMGenres = DOMModalItem.children[3].children[1];
-            var DOMDescription = DOMModalItem.children[3].children[2];
-            var DOMCredits = DOMModalItem.children[3].lastElementChild;
-
-            var DOMTItem = DOM.templateModal.content.children[0]
-            var DOMTSpan = DOM.templateModal.content.children[3]
-            var DOMItem;
-
-            DOMTitle.textContent = data.title;
-            DOMDescription.textContent = data?.overview;
-
-            if (data?.backdrop_path != null) {
-                DOMImg.setAttribute(
-                    "src",
-                    `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
-                );
-                DOMImg.setAttribute("alt", data.title);
-                DOMImg.setAttribute("data-display", "1");
-            }
-
-            if (data.genres.length > 0) {
-                for (var genre of data.genres) {
-                    DOMItem = DOMTItem.cloneNode(true);
-                    DOMItem.textContent = genre.name;
-                    DOMItem.setAttribute("data-id", genre.id);
-                    DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
-                    Modal.fragment.appendChild(DOMItem);
-                }
-                DOMGenres.appendChild(Modal.fragment);
-            }
-
-            var DOMPopularity = DOMTSec.cloneNode(true);
-            DOMPopularity.firstElementChild.textContent = "Popularity:";
-            DOMItem = DOMTSpan.cloneNode(true);
-            DOMItem.textContent = String(data.popularity);
-            DOMPopularity.appendChild(DOMItem);
-            DOMCredits?.appendChild(DOMPopularity);
-
-            var DOMDate = DOMTSec.cloneNode(true);
-            DOMDate.firstElementChild.textContent = "Release Date:";
-            DOMItem = DOMTSpan.cloneNode(true);
-            DOMItem.textContent = data.release_date;
-            DOMDate.appendChild(DOMItem);
-            DOMCredits?.appendChild(DOMDate);
-
-            if (data.spoken_languages.length > 0) {
-                var DOMLang = DOMTSec.cloneNode(true);
-                DOMLang.firstElementChild.textContent = "Languages:";
-                for (var lang of data.spoken_languages) {
-                    DOMItem = DOMTSpan.cloneNode(true);
-                    if (lang.name.length > 0) {
-                        DOMItem.textContent = lang.name;
-                    } else {
-                        DOMItem.textContent = lang.english_name;
-                    }
-                    DOMLang.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMLang);
-            }
-
-            if (data.production_companies.length > 0) {
-                var DOMPC = DOMTSec.cloneNode(true);
-                DOMPC.firstElementChild.textContent = "Companies:";
-                for (var companies of data.production_companies) {
-                    DOMItem = DOMTItem.cloneNode(true);
-                    DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
-                    DOMTItem.setAttribute("data-id", companies.id);
-                    DOMItem.textContent = companies.name;
-                    DOMPC.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMPC);
-            }
-
-            if (data.production_countries.length > 0) {
-                var DOMPC = DOMTSec.cloneNode(true);
-                DOMPC.firstElementChild.textContent = "Countries:";
-                for (var countries of data.production_countries) {
-                    DOMItem = DOMTSpan.cloneNode(true);
-                    DOMItem.textContent = countries.name;
-                    DOMPC.appendChild(DOMItem);
-                }
-                DOMCredits?.appendChild(DOMPC);
-            }
-
+        DOMTitle.textContent = data.title;
+        DOMDescription.textContent = data?.overview;
+        if (data.runtime !== undefined) {
+            DOMDuration.textContent = `${data.runtime} min`
         }
-        Modal.getCredit(
-            mediaType,
-            id,
-            DOMModalItem,
-            DOM.templateModal.content
-        );
-        Modal.dataLoaded = true;
-        console.info(data);
+
+        if (data?.backdrop_path != null) {
+            DOMImg.setAttribute(
+                "src",
+                `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
+            );
+            DOMImg.setAttribute("alt", data.title);
+            DOMImg.setAttribute("data-display", "1");
+        }
+
+        if (data.genres.length > 0) {
+            for (var genre of data.genres) {
+                DOMItem = DOMTItem.cloneNode(true);
+                DOMItem.textContent = genre.name;
+                DOMItem.setAttribute("data-id", genre.id);
+                DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
+                Modal.fragment.appendChild(DOMItem);
+            }
+            DOMGenres.appendChild(Modal.fragment);
+        }
+
+        var DOMPopularity = DOMTSec.cloneNode(true);
+        DOMPopularity.firstElementChild.textContent = "Popularity:";
+        DOMItem = DOMTSpan.cloneNode(true);
+        DOMItem.textContent = String(data.popularity);
+        DOMPopularity.appendChild(DOMItem);
+        DOMPData?.appendChild(DOMPopularity);
+
+        var DOMDate = DOMTSec.cloneNode(true);
+        DOMDate.firstElementChild.textContent = "Release Date:";
+        DOMItem = DOMTSpan.cloneNode(true);
+        DOMItem.textContent = data.release_date;
+        DOMDate.appendChild(DOMItem);
+        DOMPData?.appendChild(DOMDate);
+
+        if (data.spoken_languages.length > 0) {
+            var DOMLang = DOMTSec.cloneNode(true);
+            DOMLang.firstElementChild.textContent = "Languages:";
+            for (var lang of data.spoken_languages) {
+                DOMItem = DOMTSpan.cloneNode(true);
+                if (lang.name.length > 0) {
+                    DOMItem.textContent = lang.name;
+                } else {
+                    DOMItem.textContent = lang.english_name;
+                }
+                DOMLang.appendChild(DOMItem);
+            }
+            DOMPData?.appendChild(DOMLang);
+        }
+        if (data.production_countries.length > 0) {
+            var DOMPC = DOMTSec.cloneNode(true);
+            DOMPC.firstElementChild.textContent = "Countries:";
+            for (var countries of data.production_countries) {
+                DOMItem = DOMTSpan.cloneNode(true);
+                DOMItem.textContent = countries.name;
+                DOMPC.appendChild(DOMItem);
+            }
+            DOMPData?.appendChild(DOMPC);
+        }
+        if (data.production_companies.length > 0) {
+            var DOMPC = DOMTSec.cloneNode(true);
+            DOMPC.setAttribute("data-more", "0");
+            DOMPC.firstElementChild.textContent = "Companies:";
+            for (var companies of data.production_companies) {
+                DOMItem = DOMTItem.cloneNode(true);
+                DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                DOMTItem.setAttribute("data-id", companies.id);
+                DOMItem.textContent = companies.name;
+                DOMPC.appendChild(DOMItem);
+            }
+            if (data.production_companies.length > 3) {
+                var DOMBut = DOMTButton.cloneNode(false);
+                DOMBut.setAttribute("class", "more");
+                DOMBut.setAttribute("data-type", TYPE.MODAL_C_MORE);
+                DOMBut.textContent = "more";
+                DOMPC.appendChild(DOMBut);
+            }
+            DOMPData?.appendChild(DOMPC);
+        }
+    },
+    /**
+    @type {(data: MDBITv, DOM: DOM_T) => undefined} */
+    DOMMTvFill(data, DOM) {
+        var DOMModal = DOM.modal;
+        var DOMTSec =  DOM.templateModal.content.children[2];
+        var DOMTItem = DOM.templateModal.content.children[0];
+        var DOMModalItem = DOMModal.children[0];
+        var DOMImg = DOMModalItem.children[1].firstElementChild.firstElementChild;
+
+        var DOMContent = DOMModalItem.children[3];
+        var DOMTitle = DOMContent.children[0];
+        var DOMGenres = DOMContent.children[1];
+        var DOMDuration = DOMContent.children[2];
+        var DOMDescription = DOMContent.children[3];
+        var DOMPData = DOMContent.children[4];
+
+        var DOMTItem = DOM.templateModal.content.children[0]
+        var DOMTSpan = DOM.templateModal.content.children[3]
+        var DOMTButton = DOM.templateModal.content.children[4]
+
+        var DOMItem;
+
+        DOMTitle.textContent = data.name;
+        DOMDescription.textContent = data?.overview;
+
+        DOMDuration.textContent = `${data.number_of_episodes} episodes, ${data.number_of_seasons} seasons`;
+
+        if (data?.backdrop_path != null) {
+            DOMImg.setAttribute(
+                "src",
+                `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
+            );
+            DOMImg.setAttribute("data-display", "1");
+        }
+
+        if (data.genres.length > 0) {
+            for (var genre of data.genres) {
+                DOMItem = DOMTItem.cloneNode(true);
+                DOMItem.textContent = genre.name;
+                DOMItem.setAttribute("data-id", genre.id);
+                DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
+                Modal.fragment.appendChild(DOMItem);
+            }
+            DOMGenres.appendChild(Modal.fragment);
+        }
+
+        var DOMPopularity = DOMTSec.cloneNode(true);
+        DOMPopularity.firstElementChild.textContent = "Popularity:";
+        DOMItem = DOMTSpan.cloneNode(true);
+        DOMItem.textContent = String(data.popularity);
+        DOMPopularity.appendChild(DOMItem);
+        DOMPData?.appendChild(DOMPopularity);
+
+        var DOMDate = DOMTSec.cloneNode(true);
+        DOMDate.firstElementChild.textContent = "First Air Date:";
+        DOMItem = DOMTSpan.cloneNode(true);
+        DOMItem.textContent = data.first_air_date;
+        DOMDate.appendChild(DOMItem);
+        DOMPData.appendChild(DOMDate);
+
+        if (data.spoken_languages.length > 0) {
+            var DOMLang = DOMTSec.cloneNode(true);
+            DOMLang.firstElementChild.textContent = "Languages:";
+            for (var lang of data.spoken_languages) {
+                DOMItem = DOMTSpan.cloneNode(true);
+                if (lang.name.length > 0) {
+                    DOMItem.textContent = lang.name;
+                } else {
+                    DOMItem.textContent = lang.english_name;
+                }
+                DOMLang.appendChild(DOMItem);
+            }
+            DOMPData?.appendChild(DOMLang);
+        }
+        if (data.production_countries.length > 0) {
+            var DOMPC = DOMTSec.cloneNode(true);
+            DOMPC.firstElementChild.textContent = "Countries:";
+            for (var countries of data.production_countries) {
+                DOMItem = DOMTSpan.cloneNode(true);
+                DOMItem.textContent = countries.name;
+                DOMPC.appendChild(DOMItem);
+            }
+            DOMPData?.appendChild(DOMPC);
+        }
+        if (data.production_companies.length > 0) {
+            var DOMPC = DOMTSec.cloneNode(true);
+            DOMPC.setAttribute("data-more", "0");
+            DOMPC.firstElementChild.textContent = "Companies:";
+            for (var companies of data.production_companies) {
+                DOMItem = DOMTItem.cloneNode(true);
+                DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                DOMTItem.setAttribute("data-id", companies.id);
+                DOMItem.textContent = companies.name;
+                DOMPC.appendChild(DOMItem);
+            }
+            if (data.production_companies.length > 3) {
+                var DOMBut = DOMTButton.cloneNode(false);
+                DOMBut.setAttribute("class", "more");
+                DOMBut.setAttribute("data-type", TYPE.MODAL_C_MORE);
+                DOMBut.textContent = "more";
+                DOMPC.appendChild(DOMBut);
+            }
+            DOMPData?.appendChild(DOMPC);
+        }
     },
     /**
     @type {(DOM: DOM_T) => undefined} */
     close(DOM) {
-        if (!Modal.dataLoaded || !Modal.creditsLoaded) {
-            abortFetch("Close Modal");
+        if (!Modal.dataLoaded || !Modal.creditsLoaded || !Modal.similarLoaded) {
+            abortFetch("The modal is closed");
         }
         Modal.dataLoaded = false;
         Modal.creditsLoaded = false;
@@ -723,22 +851,25 @@ const Modal = {
             DOMModalItem = DOM.modal.children[1];
         }
         var DOMImg = DOMModalItem.children[1].firstElementChild?.firstElementChild;
-        var DOMTitle = DOMModalItem.children[3].children[0];
-        var DOMGenres = DOMModalItem.children[3].children[1];
-        var DOMDescription = DOMModalItem.children[3].children[2];
-
-        DOMModalItem.children[3].lastElementChild.replaceChildren();
+        var DOMContent = DOMModalItem.children[3];
 
         DOMImg.setAttribute("data-display", "0");
-        DOMTitle.textContent = "";
-        DOMDescription.textContent = "";
 
-        DOMGenres.replaceChildren();
+        var l = DOMContent.children.length;
+        DOMContent.children[0].replaceChildren();   //DOMTitle
+        DOMContent.children[1].replaceChildren();   //DOMGenters
+        DOMContent.children[2].replaceChildren();   //DOMDuration
+        DOMContent.children[3].replaceChildren();   //DOMDescription
+        DOMContent.children[4].replaceChildren();   //DOMPrimaryData
+        DOMContent.children[5].replaceChildren();   //DOMCast
+        DOMContent.children[l - 2].lastElementChild.replaceChildren();//DOMSimilars
+        DOMContent.lastElementChild.replaceChildren();  //DOMCredits
+
         DOM.main.style.removeProperty("transform");
         DOM.main.style.setProperty("position", "relative");
 
-        document.firstElementChild.scrollTop = View.topScroll;
         DOM.modal.setAttribute("data-display", "0");
+        document.firstElementChild.scrollTop = View.topScroll;
     },
     /**
     @type {(
@@ -784,7 +915,6 @@ window.addEventListener("DOMContentLoaded", function () {
     var DOM = {
         //template
         templateCollection: document.getElementById("template_collection"),
-        templateIcons: document.getElementById("template_icons"),
         templateModal: document.getElementById("template_modal"),
         //header
         headerButtonNav: document.getElementById("header_button-nav"),
@@ -802,9 +932,6 @@ window.addEventListener("DOMContentLoaded", function () {
 
     if (DOM.templateCollection === null) {
         throw Error("DOM.templateCollection is null");
-    }
-    if (DOM.templateIcons === null) {
-        throw Error("DOM.templateIcons is null");
     }
     if (DOM.templateModal === null) {
         throw Error("DOM.templateModal is null");
@@ -874,6 +1001,13 @@ window.addEventListener("DOMContentLoaded", function () {
         var type = target.getAttribute("data-type");
         if (type === TYPE.MODAL || type === TYPE.MODAL_CLOSE) {
             Modal.close(DOM);
+        } else if (type === TYPE.MODAL_C_MORE) {
+            target.parentElement.setAttribute("data-more", "1")
+        } else if (type === TYPE.COLL_ITEM) {
+            Modal.close(DOM);
+            var mediaType = target?.getAttribute("data-media");
+            var id = target?.getAttribute("data-id");
+            Modal.open(mediaType, id, DOM);
         }
     });
 
@@ -1003,7 +1137,7 @@ window.addEventListener("DOMContentLoaded", function () {
         } else {
             CollectionState.len = CollectionState.MAX;
         }
-        console.info(CollectionState)
+        console.info("Collection:", CollectionState)
 
         DOM.buttonMore?.setAttribute("data-display", "1");
 
