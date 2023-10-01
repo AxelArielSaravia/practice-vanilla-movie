@@ -1004,8 +1004,9 @@ window.addEventListener("DOMContentLoaded", function () {
         } else if (type === TYPE.MODAL_C_MORE) {
             target.parentElement.setAttribute("data-more", "1")
         } else if (type === TYPE.COLL_ITEM) {
-            Modal.close(DOM);
+            var id = target?.getAttribute("data-id");
             var mediaType = target?.getAttribute("data-media");
+            Modal.close(DOM);
             Modal.open(mediaType, id, DOM);
         }
     });
