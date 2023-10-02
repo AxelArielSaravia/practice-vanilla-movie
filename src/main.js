@@ -32,6 +32,9 @@ const TYPE = {
     /**
     @type {"13"} */
     MODAL_C_MORE: "13",
+    /**
+    @type {"14"} */
+    MODAL_SEASON_N: "14",
 };
 
 const CollectionState = {
@@ -96,7 +99,6 @@ const Theme = {
 };
 
 const NavMethods = {
-    ATTR_SHOW: "data-mbshow",
     ATTR_SELECTED: "data-selected",
     ATTR_LINK_TYPE: "data-linkt",
     HIDDEN: "0",
@@ -368,9 +370,15 @@ function abortFetch(msg) {
 const Modal = {
     MAX_SIMILAR: 4,
     fragment: document.createDocumentFragment(),
+    id: "",
+    /**
+    @type {"tv" | "movie"} */
+    mediaType: "tv",
     creditsLoaded: false,
     dataLoaded: false,
     similarLoaded: false,
+    seasonLoaded: false,
+    seasonNumber: -1,
     /**
     @type {(
         mediaType: "tv" | "movie",
@@ -400,35 +408,111 @@ const Modal = {
             return;
         }
         if (mediaType === "tv") {
+            var DOMModalTv = DOM.modal.children[0];
+            Modal.getCredit(
+                mediaType,
+                id,
+                DOMModalTv,
+                DOM.templateModal.content
+            );
+            Modal.getSimilar(
+                mediaType,
+                id,
+                DOMModalTv,
+                DOM.templateModal.content
+            );
+            var seasons = data.seasons;
+            if (seasons.length > 0) {
+                Modal.seasonNumber = seasons[0].season_number;
+                Modal.getSeason(
+                    id,
+                    Modal.seasonNumber,
+                    DOMModalTv,
+                    DOM.templateModal.content
+                );
+            } else {
+                Modal.seasonNumber = -1;
+            }
             Modal.DOMMTvFill(data, DOM);
-            Modal.getCredit(
-                mediaType,
-                id,
-                DOM.modal.children[0],
-                DOM.templateModal.content
-            );
-            Modal.getSimilar(
-                mediaType,
-                id,
-                DOM.modal.children[0],
-                DOM.templateModal.content
-            );
         } else {
-            Modal.DOMMMovieFill(data, DOM)
+            var DOMModalMovie = DOM.modal.children[1];
             Modal.getCredit(
                 mediaType,
                 id,
-                DOM.modal.children[1],
+                DOMModalMovie,
                 DOM.templateModal.content
             );
             Modal.getSimilar(
                 mediaType,
                 id,
-                DOM.modal.children[1],
+                DOMModalMovie,
                 DOM.templateModal.content
             );
+            Modal.DOMMMovieFill(data, DOM)
         }
         Modal.dataLoaded = true;
+    },
+    /**
+    @type {(
+        id: string,
+        n: number,
+        DOMModalData: HTMLElement,
+        DFModal: DocumentFragment,
+    ) => Promise<undefined>}*/
+    async getSeason(id, n, DOMModalData, DFModal) {
+        var data = await API.getSeason(id, n, FETCH_OPT);
+        console.info("season:", data);
+        if (data === undefined) {
+            return;
+        }
+        var DOMSeason = DOMModalData.children[3].children[6];
+        var DOMTEpisode = DFModal.children[8];
+
+        var DOMSEpisodeCount = DOMSeason.firstElementChild.firstElementChild;
+        var DOMSTitle = DOMSeason.children[1];
+        var DOMSDescription = DOMSeason.children[2];
+        var DOMEpisodes = DOMSeason.children[3];
+
+        DOMSEpisodeCount.textContent = `${data.episodes.length} episodes`;
+        DOMSTitle.textContent = data.name;
+        DOMSDescription.textContent = data.overview;
+
+        if (data.episodes.length > 0) {
+            var episodes = data.episodes;
+            for (var episode of episodes) {
+                var DOMEpisode = DOMTEpisode.cloneNode(true);
+                var DOMEImg = DOMEpisode.children[0];
+                var DOMEDate = DOMEpisode.children[1].firstElementChild;
+                var DOMENum = DOMEpisode.children[1].lastElementChild;
+                var DOMEName = DOMEpisode.children[2];
+                var DOMETime = DOMEpisode.children[3];
+                var DOMEDescription = DOMEpisode.children[4];
+                if (episode.still_path !== null) {
+                    DOMEImg.setAttribute(
+                        "src",
+                        `https://image.tmdb.org/t/p/w400${episode.still_path}`
+                    );
+                    DOMEImg.setAttribute("alt", episode.name);
+                }
+
+                DOMEDate.textContent = episode.air_date;
+                DOMENum.textContent = episode.episode_number;
+
+                DOMEName.textContent = episode.name;
+
+                if (episode.runtime !== null) {
+                    DOMETime.textContent = `${episode.runtime} min`
+                }
+
+                DOMEDescription.textContent = episode.overview;
+                Modal.fragment.appendChild(DOMEpisode);
+            }
+            DOMEpisodes.replaceChildren(Modal.fragment);
+        } else {
+            DOMEpisodes.replaceChildren();
+        }
+
+        Modal.seasonLoaded = true;
     },
     /**
     @type {(
@@ -497,7 +581,7 @@ const Modal = {
         if (results != null && 0 < results.length) {
             DOMSimilar.setAttribute("data-display", "1");
             var i = 0;
-            while (i < results.length && i < Modal.MAX_SIMILAR) {
+            while (i < results.length) {
                 var dataItem = results[i];
                 var DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.setAttribute("data-id", dataItem.id);
@@ -745,10 +829,13 @@ const Modal = {
         var DOMDuration = DOMContent.children[2];
         var DOMDescription = DOMContent.children[3];
         var DOMPData = DOMContent.children[4];
+        var DOMSeason = DOMContent.children[6];
 
-        var DOMTItem = DOM.templateModal.content.children[0]
-        var DOMTSpan = DOM.templateModal.content.children[3]
-        var DOMTButton = DOM.templateModal.content.children[4]
+        var DOMTItem = DOM.templateModal.content.children[0];
+        var DOMTSpan = DOM.templateModal.content.children[3];
+        var DOMTButton = DOM.templateModal.content.children[4];
+        var DOMTSeason = DOM.templateModal.content.children[6];
+        var DOMTOption = DOM.templateModal.content.children[7];
 
         var DOMItem;
 
@@ -762,6 +849,7 @@ const Modal = {
                 "src",
                 `https://image.tmdb.org/t/p/w780${data.backdrop_path}`
             );
+            DOMImg.setAttribute("alt", data.name)
             DOMImg.setAttribute("data-display", "1");
         }
 
@@ -834,18 +922,43 @@ const Modal = {
             }
             DOMPData?.appendChild(DOMPC);
         }
+        if (Modal.seasonNumber !== -1) {
+            var seasons = data.seasons;
+            var DOMCSeason = DOMTSeason.content.cloneNode(true);
+            var DOMSEpisodeCount = DOMCSeason.children[0].firstElementChild;
+            var DOMSSelect = DOMCSeason.children[0].lastElementChild;
+            var DOMSName = DOMCSeason.children[1];
+            var DOMSOverview = DOMCSeason.children[2];
+
+            DOMSeason.setAttribute("data-display", "1");
+            DOMSEpisodeCount.textContent = `${seasons[0].episode_count} episodes`;
+            DOMSName.textContent = seasons[0].name;
+            DOMSOverview.textContent = seasons[0].overview;
+
+            for (let i = 0; i < seasons.length; i += 1) {
+                var n = seasons[i].season_number;
+                var DOMOption = DOMTOption.cloneNode(false);
+                DOMOption.textContent = `Season ${n}`;
+                DOMOption.setAttribute("value", String(n));
+                DOMSSelect.appendChild(DOMOption);
+            }
+            DOMSeason.appendChild(DOMCSeason);
+        }
     },
     /**
     @type {(DOM: DOM_T) => undefined} */
     close(DOM) {
-        if (!Modal.dataLoaded || !Modal.creditsLoaded || !Modal.similarLoaded) {
+        if (
+            !Modal.dataLoaded
+            || !Modal.creditsLoaded
+            || !Modal.similarLoaded
+            || !Modal.seasonLoaded
+        ) {
             abortFetch("The modal is closed");
         }
-        Modal.dataLoaded = false;
-        Modal.creditsLoaded = false;
-        var type = DOM.modal.getAttribute("data-select");
+
         var DOMModalItem;
-        if (type === "tv") {
+        if (Modal.mediaType === "tv") {
             DOMModalItem = DOM.modal.children[0];
         } else {
             DOMModalItem = DOM.modal.children[1];
@@ -853,7 +966,9 @@ const Modal = {
         var DOMImg = DOMModalItem.children[1].firstElementChild?.firstElementChild;
         var DOMContent = DOMModalItem.children[3];
 
-        DOMImg.setAttribute("data-display", "0");
+        DOMImg?.setAttribute("data-display", "0");
+        DOMImg?.setAttribute("src", "");
+        DOMImg?.setAttribute("alt", "");
 
         var l = DOMContent.children.length;
         DOMContent.children[0].replaceChildren();   //DOMTitle
@@ -862,14 +977,30 @@ const Modal = {
         DOMContent.children[3].replaceChildren();   //DOMDescription
         DOMContent.children[4].replaceChildren();   //DOMPrimaryData
         DOMContent.children[5].replaceChildren();   //DOMCast
-        DOMContent.children[l - 2].lastElementChild.replaceChildren();//DOMSimilars
         DOMContent.lastElementChild.replaceChildren();  //DOMCredits
+
+        if (Modal.mediaType === "tv") {
+            var DOMSeason = DOMContent.children[6];
+            DOMSeason.replaceChildren();
+            DOMSeason.setAttribute("data-display", "0");
+        }
+
+        var DOMSimilars = DOMContent.children[l - 2]
+        DOMSimilars.setAttribute("data-display", "0");
+        DOMSimilars.lastElementChild.replaceChildren();
 
         DOM.main.style.removeProperty("transform");
         DOM.main.style.setProperty("position", "relative");
 
         DOM.modal.setAttribute("data-display", "0");
         document.firstElementChild.scrollTop = View.topScroll;
+
+        Modal.seasonNumber = -1;
+        Modal.id = "";
+        Modal.dataLoaded = false;
+        Modal.creditsLoaded = false;
+        Modal.similarLoaded = false;
+        Modal.seasonLoaded = false;
     },
     /**
     @type {(
@@ -880,6 +1011,9 @@ const Modal = {
     open (mediaType, id, DOM) {
         View.topScroll = document.firstElementChild.scrollTop;
         document.firstElementChild.scrollTop = 0;
+
+        Modal.mediaType = mediaType;
+        Modal.id = id;
 
         DOM.modal.setAttribute("data-display", "1");
         DOM.modal.setAttribute("data-select", mediaType);
@@ -1008,6 +1142,20 @@ window.addEventListener("DOMContentLoaded", function () {
             var mediaType = target?.getAttribute("data-media");
             Modal.close(DOM);
             Modal.open(mediaType, id, DOM);
+        } else if (type === TYPE.MODAL_SEASON_N) {
+            var value = Number(target.value);
+            if (value === NaN) {
+                    return;
+            }
+            if (value !== Modal.seasonNumber) {
+                Modal.seasonNumber = value;
+                Modal.getSeason(
+                    Modal.id,
+                    value,
+                    DOM.modal.children[0],
+                    DOM.templateModal.content
+                );
+            }
         }
     });
 

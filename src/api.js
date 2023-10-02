@@ -111,6 +111,18 @@ const API = {
             `${window.location.origin}/api/credits?type=${type}&id=${id}`,
             option
         ).then(fetchResolve);
+    },
+    /**
+    @type {(
+        id: string,
+        n: number,
+        option: undefined | {signal: AbortSignal}
+    ) => Promise<object>} */
+    getSeason(id, n, option) {
+        return fetch(
+            `${window.location.origin}/api/season?id=${id}&n=${n}`,
+            option
+        ).then(fetchResolve);
     }
 };
 

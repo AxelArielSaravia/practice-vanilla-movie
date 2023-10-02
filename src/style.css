@@ -554,8 +554,8 @@ body {
 
 /*Collection*/
 :is(.collection,.collection-skeleton) {
-    --left-bg: linear-gradient(90deg,var(--color-primary) 0,transparent);
-    --right-bg: linear-gradient(270deg,var(--color-primary) 0,transparent);
+    --left-bg: linear-gradient(90deg,var(--color-primary) 10%,transparent);
+    --right-bg: linear-gradient(270deg,var(--color-primary) 10%,transparent);
     position: relative;
     z-index: 1;
     margin-bottom: 40px;
@@ -626,6 +626,11 @@ body {
     background: var(--color-skeleton);
 }
 
+.collection .b-left[data-display="0"]~.slider::before,
+.collection .b-right[data-display="0"]~.slider::after {
+    display: none;
+}
+
 .collection .slider .item {
     background-color: var(--color-loading);
 }
@@ -661,7 +666,6 @@ body {
     transform: rotate(-25deg);
     z-index: 0;
 }
-
 
 @media (pointer: fine) {
     :is(.collection,.collection-skeleton) {
@@ -776,7 +780,6 @@ body {
         --item-width: 33%;
         --item-height: 16.7vw;
     }
-
 }
 
 @media (max-width: 639px) and (min-width: 380px) {
@@ -841,6 +844,8 @@ footer a {
 
 /*Modal*/
 .modal {
+    --left-bg: linear-gradient(90deg, var(--color-primary) 0, transparent);
+    --right-bg: linear-gradient(270deg, var(--color-primary) 0, transparent);
     position: relative;
     top: 0;
     width: 100%;
@@ -992,6 +997,7 @@ footer a {
 
 .modal .content :is(p, .item, .more, .text) {
     font-size: 1.5rem;
+    color: var(--color-secondary);
 }
 .modal .content .duration {
     font-weight: 600;
@@ -1038,6 +1044,7 @@ footer a {
 }
 
 .modal .similars {
+    position: relative;
     margin-block: 50px;
 }
 
@@ -1048,8 +1055,27 @@ footer a {
 
 .modal .similars>div {
     display: flex;
-    flex-wrap: wrap;
+    overflow: auto;
     gap: 5px;
+    padding: 10px;
+}
+
+.modal .similars>div::before,
+.modal .similars>div::after{
+    content: "";
+    position: absolute;
+    width: 10px;
+    max-height: 300px;
+    height: 45vw;
+    z-index: 2;
+}
+.modal .similars>div::before {
+    left: 0;
+    background: var(--left-bg);
+}
+.modal .similars>div::after {
+    right: 0;
+    background: var(--right-bg);
 }
 
 .modal .similar {
@@ -1061,6 +1087,8 @@ footer a {
     background-color: var(--color-loading);
     border-radius: 3px;
     overflow: hidden;
+    max-height: 300px;
+    height: 45vw;
 }
 
 .modal .similar::after {
@@ -1082,14 +1110,25 @@ footer a {
 .modal .similar img {
     position: relative;
     z-index: 1;
-    width: 100%;
+    height: 100%;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .modal .content .item:hover {
         text-decoration: underline;
     }
+
     .modal .content .jobs .more:hover {
         font-weight: 600;
+    }
+    .modal .similar {
+        transition: transform 300ms ease-out;
+    }
+    .modal .similar:hover {
+        transform: scale(1.06);
+        z-index: 3;
+    }
+    .modal .similars>div:not(:hover)::-webkit-scrollbar {
+        visibility: hidden;
     }
 }

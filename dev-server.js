@@ -10,6 +10,7 @@ import toprated from "./api/toprated.js";
 import movie    from "./api/movie.js";
 import tv       from "./api/tv.js";
 import credits  from "./api/credits.js";
+import season  from "./api/season.js";
 
 const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 
@@ -81,6 +82,8 @@ Bun.serve({
                 return tv(req);
             } else if (reqPath.endsWith("credits")) {
                 return credits(req);
+            } else if (reqPath.endsWith("season")) {
+                return season(req);
             }
             return ResponseBad;
         } else {

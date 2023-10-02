@@ -292,7 +292,7 @@
                 <p class="description" data-loading="1"></p>
                 <section class="primary-data" data-loading="1"></section>
                 <section class="cast" data-loading="1"></section>
-                <section class="season" data-loading="1"></section>
+                <section class="season" data-display="0" data-loading="1"></section>
                 <section class="similars" data-display="0" data-loading="1">
                     <h3>Similar TV Series</h3>
                     <div></div>
@@ -453,6 +453,29 @@
             </svg>
             <h3 data-opacity="0"></h3>
         </button>
+    <!--6 Season-->
+        <template>
+            <section>
+                <p class="episode-count"></p>
+                <select data-type="14"></select>
+            </section>
+            <h3 class="season-title"></h3>
+            <p class="season-description"></p>
+            <div class="episodes"></div>
+        </template>
+    <!--7 option-->
+        <option></option>
+    <!--8 episode-->
+        <div class="episode">
+            <img src="" alt=""/>
+            <div>
+                <p class="date"></p>
+                <p class="num"></p>
+            </div>
+            <h4 class="name"></h4>
+            <p class="time"></p>
+            <p class="description"></p>
+        </div>
     </template>
 </body>
 </html>

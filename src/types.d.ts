@@ -267,6 +267,34 @@ type MDBCredits = {
     crew: MDBCrew,
 };
 
+type MDBSeason = {
+    air_date: string,
+    episodes: Array<{
+        air_date: string,
+        crew: Array<{}>,
+        episode_number: number,
+        episode_type: string,
+        guest_stars: Array<{}>,
+        id: number,
+        name: string,
+        overview: string,
+        production_code: string,
+        runtime: number,
+        season_number: number,
+        show_id: number,
+        still_path: string,
+        vote_average: number,
+        vote_count: number,
+    }>,
+    id: number,
+    name: string,
+    overview: string,
+    poster_path: string,
+    season_number: number,
+    vote_average: number,
+    _id: string,
+}
+
 // Override
 interface LocalStorage {
     getItem(i: "theme"): "dark" | "light";
