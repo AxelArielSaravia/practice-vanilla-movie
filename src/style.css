@@ -1113,6 +1113,10 @@ footer a {
     height: 100%;
 }
 
+.modal .episode img {
+    width: 20vw;
+}
+
 @media (hover: hover) and (pointer: fine) {
     .modal .content .item:hover {
         text-decoration: underline;

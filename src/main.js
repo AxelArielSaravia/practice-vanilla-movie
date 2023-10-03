@@ -934,15 +934,19 @@ const Modal = {
             DOMSEpisodeCount.textContent = `${seasons[0].episode_count} episodes`;
             DOMSName.textContent = seasons[0].name;
             DOMSOverview.textContent = seasons[0].overview;
-
-            for (let i = 0; i < seasons.length; i += 1) {
-                var n = seasons[i].season_number;
-                var DOMOption = DOMTOption.cloneNode(false);
-                DOMOption.textContent = `Season ${n}`;
-                DOMOption.setAttribute("value", String(n));
-                DOMSSelect.appendChild(DOMOption);
+            if (seasons.length > 1) {
+                for (let i = 0; i < seasons.length; i += 1) {
+                    var n = seasons[i].season_number;
+                    var DOMOption = DOMTOption.cloneNode(false);
+                    DOMOption.textContent = `Season ${n}`;
+                    DOMOption.setAttribute("value", String(n));
+                    DOMSSelect.appendChild(DOMOption);
+                }
+            } else {
+                DOMSSelect.setAttribute("data-display", "0");
             }
             DOMSeason.appendChild(DOMCSeason);
+
         }
     },
     /**
@@ -1142,7 +1146,12 @@ window.addEventListener("DOMContentLoaded", function () {
             var mediaType = target?.getAttribute("data-media");
             Modal.close(DOM);
             Modal.open(mediaType, id, DOM);
-        } else if (type === TYPE.MODAL_SEASON_N) {
+        }
+    });
+    DOM.modal.addEventListener("change", function (e) {
+        var target = e.target;
+        var type = target.getAttribute("data-type");
+        if (type === TYPE.MODAL_SEASON_N) {
             var value = Number(target.value);
             if (value === NaN) {
                     return;
@@ -1157,7 +1166,7 @@ window.addEventListener("DOMContentLoaded", function () {
                 );
             }
         }
-    });
+    })
 
     var trendingPromise = API.getTrending("1");
     trendingPromise.then(function (data) {
