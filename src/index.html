@@ -469,24 +469,26 @@
         <template>
             <section>
                 <p class="episode-count"></p>
-                <select data-type="14"></select>
+                <select class="seasons" data-type="14"></select>
             </section>
             <h3 class="season-title"></h3>
             <p class="season-description"></p>
-            <div class="episodes"></div>
+            <div class="episodes" data-more="0"></div>
         </template>
     <!--7 option-->
         <option></option>
     <!--8 episode-->
         <div class="episode">
-            <img src="" alt=""/>
-            <div>
-                <p class="date"></p>
-                <p class="num"></p>
+            <div class="img">
+                <img src="" alt=""/>
             </div>
-            <h4 class="name"></h4>
-            <p class="time"></p>
-            <p class="description"></p>
+            <p class="num"></p>
+            <div class="info">
+                <p class="date"></p>
+                <h4 class="name"></h4>
+                <p class="time"></p>
+                <p class="overview"></p>
+            </div>
         </div>
     </template>
 </body>

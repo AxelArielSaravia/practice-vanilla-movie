@@ -423,7 +423,18 @@ const Modal = {
             );
             var seasons = data.seasons;
             if (seasons.length > 0) {
-                Modal.seasonNumber = seasons[0].season_number;
+                var isSeason1 = false;
+                for (var season of seasons) {
+                    if (season.season_number === 1) {
+                        isSeason1 = true;
+                        break;
+                    }
+                }
+                if (isSeason1) {
+                    Modal.seasonNumber = 1;
+                } else {
+                    Modal.seasonNumber = seasons[0].season_number;
+                }
                 Modal.getSeason(
                     id,
                     Modal.seasonNumber,
@@ -467,11 +478,13 @@ const Modal = {
         }
         var DOMSeason = DOMModalData.children[3].children[6];
         var DOMTEpisode = DFModal.children[8];
+        var DOMTButton = DFModal.children[4];
 
         var DOMSEpisodeCount = DOMSeason.firstElementChild.firstElementChild;
         var DOMSTitle = DOMSeason.children[1];
         var DOMSDescription = DOMSeason.children[2];
         var DOMEpisodes = DOMSeason.children[3];
+        DOMEpisodes.setAttribute("data-more", "0");
 
         DOMSEpisodeCount.textContent = `${data.episodes.length} episodes`;
         DOMSTitle.textContent = data.name;
@@ -481,12 +494,12 @@ const Modal = {
             var episodes = data.episodes;
             for (var episode of episodes) {
                 var DOMEpisode = DOMTEpisode.cloneNode(true);
-                var DOMEImg = DOMEpisode.children[0];
-                var DOMEDate = DOMEpisode.children[1].firstElementChild;
-                var DOMENum = DOMEpisode.children[1].lastElementChild;
-                var DOMEName = DOMEpisode.children[2];
-                var DOMETime = DOMEpisode.children[3];
-                var DOMEDescription = DOMEpisode.children[4];
+                var DOMEImg = DOMEpisode.children[0].firstElementChild;
+                var DOMENum = DOMEpisode.children[1]
+                var DOMEDate = DOMEpisode.children[2].children[0];
+                var DOMEName = DOMEpisode.children[2].children[1];
+                var DOMETime = DOMEpisode.children[2].children[2];
+                var DOMEDescription = DOMEpisode.children[2].children[3];
                 if (episode.still_path !== null) {
                     DOMEImg.setAttribute(
                         "src",
@@ -506,6 +519,12 @@ const Modal = {
 
                 DOMEDescription.textContent = episode.overview;
                 Modal.fragment.appendChild(DOMEpisode);
+            }
+            if (data.episodes.length > 4) {
+                var DOMMore = DOMTButton.cloneNode(true);
+                DOMMore.textContent = "more +";
+                DOMMore.setAttribute("data-type", TYPE.MODAL_C_MORE);
+                Modal.fragment.appendChild(DOMMore);
             }
             DOMEpisodes.replaceChildren(Modal.fragment);
         } else {
@@ -925,19 +944,16 @@ const Modal = {
         if (Modal.seasonNumber !== -1) {
             var seasons = data.seasons;
             var DOMCSeason = DOMTSeason.content.cloneNode(true);
-            var DOMSEpisodeCount = DOMCSeason.children[0].firstElementChild;
             var DOMSSelect = DOMCSeason.children[0].lastElementChild;
-            var DOMSName = DOMCSeason.children[1];
-            var DOMSOverview = DOMCSeason.children[2];
 
             DOMSeason.setAttribute("data-display", "1");
-            DOMSEpisodeCount.textContent = `${seasons[0].episode_count} episodes`;
-            DOMSName.textContent = seasons[0].name;
-            DOMSOverview.textContent = seasons[0].overview;
             if (seasons.length > 1) {
                 for (let i = 0; i < seasons.length; i += 1) {
                     var n = seasons[i].season_number;
                     var DOMOption = DOMTOption.cloneNode(false);
+                    if (n === 1) {
+                        DOMOption.setAttribute("selected", "true");
+                    }
                     DOMOption.textContent = `Season ${n}`;
                     DOMOption.setAttribute("value", String(n));
                     DOMSSelect.appendChild(DOMOption);

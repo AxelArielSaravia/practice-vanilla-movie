@@ -14,7 +14,17 @@ import season  from "./api/season.js";
 
 const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 
-const DIR = path.resolve(import.meta.dir, "src");
+const PROD_PATH = "public";
+const DEV_PATH = "src";
+
+var DIR;
+if (process.env.VANILLA_MOVIE_PRODUCTION !== undefined) {
+    DIR = path.resolve(import.meta.dir, PROD_PATH);
+    console.info("Production mode");
+} else {
+    DIR = path.resolve(import.meta.dir, DEV_PATH);
+    console.info("Development mode");
+}
 
 const RES_OPTS = {status: 404};
 const STATSYNC_OPTS = {bigint: false, throwIfNoEntry: false};

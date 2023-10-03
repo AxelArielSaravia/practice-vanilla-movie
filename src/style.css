@@ -847,7 +847,7 @@ footer a {
     --left-bg: linear-gradient(90deg, var(--color-primary) 0, transparent);
     --right-bg: linear-gradient(270deg, var(--color-primary) 0, transparent);
     position: relative;
-    top: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     z-index: 5;
@@ -979,7 +979,7 @@ footer a {
 
 .modal .content .genres {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap-reverse;
     gap: 5px;
     padding: 10px 0;
 }
@@ -995,7 +995,7 @@ footer a {
     font-size: 1.5rem;
 }
 
-.modal .content :is(p, .item, .more, .text) {
+.modal .content :is(p, .item, .more, .text, select) {
     font-size: 1.5rem;
     color: var(--color-secondary);
 }
@@ -1036,16 +1036,144 @@ footer a {
     margin-right: 10px;
 }
 
+.modal [data-more="1"] .more {
+    display: none !important;
+}
+
 .modal .content .jobs[data-more="0"] .item:nth-child(n + 5) {
     display: none;
 }
-.modal .content .jobs[data-more="1"] .more {
-    display: none;
+
+.modal :is(.similars, .season, .cast) {
+    margin-bottom: 50px;
 }
 
-.modal .similars {
+.modal .season>section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal .season .episode-count {
+    padding-block: 10px;
+}
+
+.modal .season .seasons {
+    font-weight: 600;
+    padding: 5px;
+    background: var(--color-loading);
+    border: 2px solid var(--color-secondary);
+    border-radius: var(--bradius-3);
+}
+
+.modal .season .season-title {
+    font-size: 2.2rem;
+}
+
+.modal .season :is(.season-title, .season-description) {
+    padding-bottom: 15px;
+}
+
+.modal .season .episodes[data-more="0"] .episode:nth-child(n + 5) {
+    display:none;
+}
+
+.modal .episodes[data-more="0"] .more {
+    display: block;
+    margin: auto;
+    padding: 10px;
+}
+
+.modal .season :is(
+    .episodes[data-more="0"] .episode:nth-child(n + 4),
+    .episode:nth-last-child(-n+2)
+) {
+    border-block: 2px solid var(--color-skeleton);
+}
+
+.modal .episode {
+    display: flex;
     position: relative;
-    margin-block: 50px;
+    overflow: hidden;
+    border-top: 2px solid var(--color-skeleton);
+    border-radius: var(--bradius-3);
+}
+
+.modal .episode:last-child {
+    border-block: 2px solid var(--color-skeleton);
+}
+
+.modal .episode .num {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 5px;
+    background: var(--color-primary);
+    border-radius: var(--bradius-3);
+    line-height: 1;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.modal .episode .img {
+    width: 100%;
+    position: absolute;
+    max-width: 300px;
+    z-index: -1;
+}
+
+.modal .episode .img img {
+    object-fit: cover;
+    width: 100%;
+    z-index: -1;
+}
+
+.modal .episode .info {
+    padding: 10px;
+    padding-left: 10vw;
+}
+
+.modal .episode .img::before,
+.modal .episode .img::after,
+.modal .episode .info::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    inset: 0;
+}
+.modal .episode .img::before {
+    background: linear-gradient(0deg, var(--color-primary), transparent 50%);
+}
+.modal .episode .img::after {
+    background: linear-gradient(270deg, var(--color-primary), transparent);
+}
+
+.modal .episode .info::after {
+    z-index: -1;
+    background: linear-gradient(125deg, var(--color-primary) 20px, transparent 70%);
+}
+
+.modal .episode h4 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.modal .episode .time {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 1200px) {
+    .modal .episode .info {
+        padding-left: 200px;
+    }
+}
+
+
+.modal .similars {
+    position: reLative;
 }
 
 .modal .similars>h3 {
@@ -1113,25 +1241,24 @@ footer a {
     height: 100%;
 }
 
-.modal .episode img {
-    width: 20vw;
-}
-
 @media (hover: hover) and (pointer: fine) {
     .modal .content .item:hover {
         text-decoration: underline;
     }
 
-    .modal .content .jobs .more:hover {
+    .modal .more:hover {
         font-weight: 600;
     }
+
     .modal .similar {
         transition: transform 300ms ease-out;
     }
+
     .modal .similar:hover {
         transform: scale(1.06);
         z-index: 3;
     }
+
     .modal .similars>div:not(:hover)::-webkit-scrollbar {
         visibility: hidden;
     }

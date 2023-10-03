@@ -28,7 +28,7 @@ fi
 bun build ./src/main.js --outdir $dir --minify
 echo JS Build main.js Successful
 
-minify -o $dir/index.html ./src/index.html
+minify -o $dir/index.html ./src/index.html --html-keep-end-tags
 echo HTML minified success
 
 minify -o $dir/style.css ./src/style.css
