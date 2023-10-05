@@ -6,9 +6,16 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var p = `${process.env.API_URL}/trending/all/day?lenguage=enUs`;
+    var qtype = url.searchParams.get("type");
+    if (
+        qtype === null
+        || (qtype !== "tv" && qtype !== "movie" && qtype !== "all")
+    ) {
+        return new Response("Bad request", _utils.RES_BAD_OPT);
+    }
+    var p = `${process.env.API_URL}/trending/${qtype}/day?lenguage=enUs`;
     var qpage = url.searchParams.get("page");
-    if (qpage !== undefined) {
+    if (qpage !== null) {
         p = `${p}&page=${qpage}`;
     }
     const r = await fetch(p, _utils.FETCH_OPT);

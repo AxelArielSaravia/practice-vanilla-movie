@@ -25,20 +25,49 @@ if [ ! -d $dir ]; then
     echo Create $dir
 fi
 
-bun build ./src/main.js --outdir $dir --minify
+if [ ! -d "$dir/movie" ]; then
+    mkdir "$dir/movie"
+    echo Create "$dir/movie"
+fi
+if [ ! -d "$dir/tv" ]; then
+    mkdir "$dir/tv"
+    echo Create "$dir/tv"
+fi
+
+bun build ./src/main.js --outdir $dir --minify --external '*'
 echo JS Build main.js Successful
 
 minify -o $dir/index.html ./src/index.html --html-keep-end-tags
-echo HTML minified success
+echo index.html minified success
 
 minify -o $dir/style.css ./src/style.css
-echo CSS minified success
+echo style.css minified success
+
+minify -o $dir/hero.css ./src/hero.css
+echo hero.css minified success
+
+minify -o $dir/tv.css ./src/tv.css
+echo tv.css minified success
+
+
+bun build ./src/tv/main.js --outdir $dir/tv --minify --external '*'
+echo JS Build /tv/main.js Successful
+
+minify -o $dir/tv/index.html ./src/tv/index.html --html-keep-end-tags
+echo /tv/index.html minified success
+
+
+bun build ./src/movie/main.js --outdir $dir/movie --minify --external '*'
+echo JS Build /movie/main.js Successful
+
+minify -o $dir/movie/index.html ./src/movie/index.html --html-keep-end-tags
+echo /movie/index.html minified success
+
 
 if [ $media = 1 ]; then
     cp -dr ./src/media $dir/media
     echo Copy media
 fi
-
 
 
 if [ $api = 1 ]; then

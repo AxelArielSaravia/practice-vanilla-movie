@@ -17,7 +17,7 @@ const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 const PROD_PATH = "public";
 const DEV_PATH = "src";
 
-var DIR;
+var DIR = "";
 if (process.env.VANILLA_MOVIE_PRODUCTION !== undefined) {
     DIR = path.resolve(import.meta.dir, PROD_PATH);
     console.info("Production mode");
@@ -36,6 +36,12 @@ const Url = new URL("a:0.a");
 function staticResponse(req, reqPath) {
     if (reqPath === "/") {
         reqPath = "/index.html";
+    }
+    if (reqPath === "/movie") {
+        reqPath = "/movie/index.html";
+    }
+    if (reqPath === "/tv") {
+        reqPath = "/tv/index.html";
     }
 
     let extension = path.extname(reqPath);

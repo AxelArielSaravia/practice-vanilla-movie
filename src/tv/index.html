@@ -7,12 +7,12 @@
         name="theme-color"
         media="(prefers-color-scheme: light)"
         content="#cdcdcd"
-    >
+    />
     <meta
         name="theme-color"
         media="(prefers-color-scheme: dark)"
         content="#1c1a1a"
-    >
+    />
     <meta name="author" content="Axel Ariel Saravia">
     <meta name="creator" content="axarisar">
     <meta
@@ -21,14 +21,14 @@
     >
     <meta name="keywords" content="fake, movie, vanilla, javascript">
     <meta name="canonical" href="https://aas-vanilla-movie.web.app">
-    <title>The Fake App</title>
-    <link rel="icon" href="/media/icon-180.png">
-    <link rel="apple-touch-icon" href="/media/icon-180.png">
-    <link rel="stylesheet" href="style.css">
+    <title>The Fake App - Tv Series</title>
+    <link rel="icon" href="/media/icon-180.png"/>
+    <link rel="apple-touch-icon" href="/media/icon-180.png"/>
+    <link rel="stylesheet" href="style.css"/>
     <link rel="stylesheet" href="hero.css">
     <link rel="stylesheet" href="tv.css">
     <script src="general.js" type="module"></script>
-    <script src="main.js" type="module"></script>
+    <script src="/tv/main.js" type="module"></script>
 </head>
 <body>
     <header class="header" role="navigation">
@@ -51,9 +51,9 @@
         </a>
         <nav class="primary-nav">
             <button id="header_button-nav" class="nav-button" type="button">
-                Home
+                Tv Shows
             </button>
-            <ul id="header_nav" class="nav" data-mbshow="0" data-selected="0">
+            <ul id="header_nav" class="nav" data-mbshow="0" data-selected="2">
                 <li class="nav-tab">
                     <a
                         href="/"
@@ -315,43 +315,7 @@
                 <section class="credits" data-loading="1"></section>
             </div>
         </article>
-        <article class="data movie">
-            <button class="close" data-type="9">
-                <svg
-                    class="icon icon-x"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            <div class="background">
-                <div class="image">
-                    <img src="" alt="" data-display="0">
-                    <div class="bottom-gradient"></div>
-                </div>
-            </div>
-            <h3 class="type">Movie</h3>
-            <div class="content">
-                <h3 data-loading="1"></h3>
-                <div class="genres" data-loading="1"></div>
-                <p class="duration"></p>
-                <p class="description" data-loading="1"></p>
-                <section class="primary-data" data-loading="1"></section>
-                <section class="cast" data-loading="1"></section>
-                <section class="similars" data-display="0" data-loading="1">
-                    <h3>Similar Movies</h3>
-                    <div></div>
-                </section>
-                <section class="credits" data-loading="1"></section>
-            </div>
-        </article>
+        <article class="data movie"></article>
     </div>
     <template id="template_collection">
      <!--0 Skeleton-->
