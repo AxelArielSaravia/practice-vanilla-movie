@@ -6,7 +6,8 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qtype = url.searchParams.get("type");
+    var qtype = url.searchParams.get("t");
+    var qpage = url.searchParams.get("p");
     if (
         qtype === null
         || (qtype !== "tv" && qtype !== "movie" && qtype !== "all")
@@ -14,7 +15,6 @@ export default async function handler(req) {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }
     var p = `${process.env.API_URL}/trending/${qtype}/day?lenguage=enUs`;
-    var qpage = url.searchParams.get("page");
     if (qpage !== null) {
         p = `${p}&page=${qpage}`;
     }

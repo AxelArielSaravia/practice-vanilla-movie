@@ -6,8 +6,8 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qid = url.searchParams.get("id");
-    var qsimilar = url.searchParams.get("similar");
+    var qid = url.searchParams.get("i");
+    var qsimilar = url.searchParams.get("s");
     if (qid === null) {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }

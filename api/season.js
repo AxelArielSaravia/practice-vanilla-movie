@@ -6,7 +6,7 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qid = url.searchParams.get("id");
+    var qid = url.searchParams.get("i");
     var qn = url.searchParams.get("n");
     if (qid === null || qn === null) {
         return new Response("Bad request", _utils.RES_BAD_OPT);

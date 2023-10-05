@@ -139,11 +139,11 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerNav.addEventListener("focusout", _.Nav.navOnfocusout);
 
     DOM.view.addEventListener("click", function (e) {
-        _.View.onclick(e.target, DOM);
+        _.View.onclick(e.target, DOM, e);
     });
 
     DOM.hero.lastElementChild.addEventListener("click", function (e) {
-        _.Hero.DOMTitleOnclick(e.target, DOM);
+        _.Hero.DOMTitleOnclick(e.target, DOM, e);
     });
 
     DOM.modal.addEventListener("click", function (e) {
@@ -186,11 +186,12 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTrending does not have data");
         }
-        var DOMColl = _.View.createDOMCollection(
+        var DOMColl = _.Collection.createDOMCollection(
             /*header*/          "Week Trendings",
             /*data*/            data.results,
-            /*mediaType*/       undefined,
-            /*DFCollection*/  DOM.templateCollection.content,
+            /*mediaType*/       "movie",
+            /*collectionType*/  _.Collection.TRENDING,
+            /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos0 = DOM.view.children[0];
         DOMPos0.insertAdjacentElement("beforebegin", DOMColl);
@@ -202,10 +203,11 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        var DOMColl = _.View.createDOMCollection(
+        var DOMColl = _.Collection.createDOMCollection(
             /*header*/          "Popular Movies",
             /*data*/            data.results,
             /*mediaType*/       "movie",
+            /*collectionType*/  _.Collection.POPULAR,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos1 = DOM.view.children[1];
@@ -218,10 +220,11 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = _.View.createDOMCollection(
+        var DOMColl = _.Collection.createDOMCollection(
             /*header*/          "Top rated movies",
             /*data*/            data.results,
             /*mediaType*/       "movie",
+            /*collectionType*/  _.Collection.TOP_RATED,
             /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos2 = DOM.view.children[2];

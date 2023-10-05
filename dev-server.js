@@ -43,6 +43,9 @@ function staticResponse(req, reqPath) {
     if (reqPath === "/tv") {
         reqPath = "/tv/index.html";
     }
+    if (reqPath === "/collection") {
+        reqPath = "/collection/index.html"
+    }
 
     let extension = path.extname(reqPath);
     if (extension.length === 0) {

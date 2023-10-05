@@ -6,8 +6,8 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qid = url.searchParams.get("id");
-    var qtype = url.searchParams.get("type");
+    var qid = url.searchParams.get("i");
+    var qtype = url.searchParams.get("t");
     if (qtype !== "movie" && qtype !== "tv") {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }

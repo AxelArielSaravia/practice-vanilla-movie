@@ -112,6 +112,25 @@ function fetchResolve(res) {
 }
 
 const API = {
+    /**
+    @type {(type: "movie" | "tv") => Promise<maybe<MDBGenres>>} */
+    getGenres(type) {
+        return (
+            fetch(`${window.location.origin}/api/genres?t=${type}`)
+            .then(fetchResolve)
+        );
+    },
+    /**
+    @type {(
+        id: string,
+        type: "movie" | "tv",
+    ) => Promise<maybe<MDBImages>>} */
+    getImages(id, type) {
+        return (
+            fetch(`${window.location.origin}/api/images?t=${type}&i=${id}`)
+            .then(fetchResolve)
+       );
+    },
     //Get trending movies and tv series
     /**
     @type {(
@@ -120,7 +139,7 @@ const API = {
     ) => Promise<maybe<MDBResponse<MDBTrending>>>} */
     getTrending(type, page = "1") {
         return (
-            fetch(`${window.location.origin}/api/trending?type=${type}&page=${page}`)
+            fetch(`${window.location.origin}/api/trending?t=${type}&p=${page}`)
             .then(fetchResolve)
         );
     },
@@ -131,7 +150,7 @@ const API = {
     ) => Promise<maybe<MDBResponse<MDBPopular>>>}*/
     getPopular(type, page = "1") {
         return (
-            fetch(`${window.location.origin}/api/popular?type=${type}&page=${page}`)
+            fetch(`${window.location.origin}/api/popular?t=${type}&p=${page}`)
             .then(fetchResolve)
         );
     },
@@ -142,30 +161,11 @@ const API = {
         page: string
     ) => Promise<maybe<MDBResponse<MDBDiscover>>>}*/
     getDiscover(type, genre, page = "1") {
-        var p = `${window.location.origin}/api/discover?type=${type}&page=${page}`;
+        var p = `${window.location.origin}/api/discover?t=${type}&p=${page}`;
         if (genre !== undefined) {
-            p = `${p}&genre=${genre}`;
+            p = `${p}&g=${genre}`;
         }
         return fetch(p).then(fetchResolve);
-    },
-    /**
-    @type {(
-        id: string,
-        type: "movie" | "tv",
-    ) => Promise<maybe<MDBImages>>} */
-    getImages(id, type) {
-        return (
-            fetch(`${window.location.origin}/api/images?type=${type}&id=${id}`)
-            .then(fetchResolve)
-       );
-    },
-    /**
-    @type {(type: "movie" | "tv") => Promise<maybe<MDBGenres>>} */
-    getGenres(type) {
-        return (
-            fetch(`${window.location.origin}/api/genres?type=${type}`)
-            .then(fetchResolve)
-        );
     },
     /**
     @type {(
@@ -174,7 +174,7 @@ const API = {
     ) => Promise<maybe<MDBResponse<MDBDiscover>>>} */
     getTopRated(type, page = "1") {
         return (
-            fetch(`${window.location.origin}/api/toprated?type=${type}&page=${page}`)
+            fetch(`${window.location.origin}/api/toprated?t=${type}&p=${page}`)
             .then(fetchResolve)
         );
     },
@@ -186,9 +186,9 @@ const API = {
         option: undefined | {signal: AbortSignal}
     ) => Promise<maybe<MDBIMovie | MDBITv>>} */
     get(type, id, similar, option) {
-        var url = `${window.location.origin}/api/${type}?id=${id}`;
+        var url = `${window.location.origin}/api/${type}?i=${id}`;
         if (similar) {
-            url += "&similar"
+            url += "&s"
         }
         return fetch(url, option).then(fetchResolve);
     },
@@ -200,7 +200,7 @@ const API = {
     ) => Promise<maybe<MDBCredits>>} */
     getCredits(type, id, option) {
         return fetch(
-            `${window.location.origin}/api/credits?type=${type}&id=${id}`,
+            `${window.location.origin}/api/credits?t=${type}&i=${id}`,
             option
         ).then(fetchResolve);
     },
@@ -212,15 +212,13 @@ const API = {
     ) => Promise<object>} */
     getSeason(id, n, option) {
         return fetch(
-            `${window.location.origin}/api/season?id=${id}&n=${n}`,
+            `${window.location.origin}/api/season?i=${id}&n=${n}`,
             option
         ).then(fetchResolve);
     }
 };
 
 const Nav = {
-    ATTR_SELECTED: "data-selected",
-    ATTR_LINK_TYPE: "data-linkt",
     ATTR_SHOW: "data-mbshow",
     HIDDEN: "0",
     SHOW: "1",
@@ -241,10 +239,8 @@ const Nav = {
     //hidde nav menu if the focus is out of the nav menu of the 
     navOnfocusout(e) {
         var relatedTarget = e.relatedTarget;
-        if (
-            relatedTarget === null
-            || relatedTarget.getAttribute("data-type") !== TYPE.NAV_LINK
-        ) {
+        var type = relatedTarget?.getAttribute("data-type");
+        if (relatedTarget === null || type !== TYPE.NAV_LINK) {
             /**@type {HTMLUListElement}*///This will crash if is null
             var DOMNav = e.currentTarget;
             DOMNav.setAttribute(
@@ -329,18 +325,19 @@ const Hero = {
         } else {
             DOMHLogo.insertAdjacentText("beforeend",hero.title);
         }
-
+        DOMInfo.setAttribute("href", Route.getHref(hero.media_type, hero.id));
         DOMInfo.setAttribute("data-media", hero.media_type);
         DOMInfo.setAttribute("data-id", hero.id);
 
         DOMDescription.insertAdjacentText("beforeend",hero.overview);
     },
     /**
-    @type {(target: HTMLElement, DOM: DOM_T) => undefined} */
-    DOMTitleOnclick(target, DOM) {
+    @type {(target: HTMLElement, DOM: DOM_T, e: Event) => undefined} */
+    DOMTitleOnclick(target, DOM, e) {
         var id = target.getAttribute("data-id");
         var mediaType = target.getAttribute("data-media");
         if (id !== null && mediaType !== null)  {
+            e.preventDefault();
             Modal.open(mediaType, id, DOM, true);
         }
     }
@@ -352,7 +349,7 @@ const Route = {
     /**
     @type {(type: "movie" | "tv", id: string) => string} */
     getHref(type, id) {
-        return `${Route.origin}?type=${type}&id=${id}`;
+        return `${Route.origin}?t=${type}&i=${id}`;
     },
     /**
     @type {(route: string) => undefined} */
@@ -362,8 +359,8 @@ const Route = {
     /**
     @type {(DOM: DOM_T) => undefined} */
     init(DOM) {
-        var qtype = Route.url.searchParams.get("type");
-        var qid = Route.url.searchParams.get("id");
+        var qtype = Route.url.searchParams.get("t");
+        var qid = Route.url.searchParams.get("i");
         if (qtype !== null && qid !== null) {
             if (qtype == "tv" || qtype == "movie") {
                 Modal.open(qtype, qid, DOM, false);
@@ -376,8 +373,8 @@ const Route = {
     @type {(DOM: DOM_T) => undefined} */
     onpopstate(DOM) {
         Route.url.href = window.location.href;
-        var qtype = Route.url.searchParams.get("type");
-        var qid = Route.url.searchParams.get("id");
+        var qtype = Route.url.searchParams.get("t");
+        var qid = Route.url.searchParams.get("i");
         if (qtype !== null || qid !== null) {
             Modal.close(DOM);
             if (qtype === "tv" || qtype === "movie") {
@@ -389,11 +386,14 @@ const Route = {
             }
         }
     }
-}
+};
 
-const View = {
+const Collection = {
     TYPE_SBUTTON: "data-sbuttont",
-    topScroll: 0,
+    TRENDING:   "0",
+    POPULAR:    "1",
+    TOP_RATED:  "2",
+    DISCOVER:   "3",
     /**
     @type {(target: HTMLElement) => undefined} */
     DOMCollButtonOnclick(target) {
@@ -403,13 +403,11 @@ const View = {
         const DOMButtonL = target.parentElement.children[1];
         /**@type {HTMLButtonElement}*/
         const DOMButtonR = target.parentElement.children[2];
-        var type = target.getAttribute(View.TYPE_SBUTTON);
+        var type = target.getAttribute(Collection.TYPE_SBUTTON);
         var scrollval = (
-            DOMSlider.clientWidth
-                - (
-                    (DOMSlider.clientWidth * 6) / 100
-                )
+            DOMSlider.clientWidth - ((DOMSlider.clientWidth * 6) / 100)
         );
+
         if (DOMSlider.scrollLeft - scrollval <= 0) {
             DOMButtonL.setAttribute("data-display", "0");
         } else {
@@ -425,13 +423,78 @@ const View = {
             DOMSlider.scrollBy(scrollval, 0);
             if (
                 DOMSlider.scrollLeft + scrollval
-                    >= DOMSlider.scrollWidth - DOMSlider.clientWidth
+                >= DOMSlider.scrollWidth - DOMSlider.clientWidth
             ) {
                 DOMButtonR.setAttribute("data-display", "0");
             }
             DOMButtonL.setAttribute("data-display", "1");
         }
     },
+    /**
+    @type {(
+        header: string,
+        data: object,
+        mediaType: "movie" | "tv" | "all",
+        collectionType: "0" | "1" | "2" | "3",
+        DFCollection: DocumentFragment,
+    ) => HTMLElement}*/
+    createDOMCollection(
+        header,
+        data,
+        mediaType,
+        collectionType,
+        DFCollection
+    ) {
+        /**@type {HTMLElement}*/
+        var DOMCollection = DFCollection.children[1].cloneNode(true);
+        var DOMTItem = DFCollection.children[2];
+
+        var DOMTitle = DOMCollection.children[0]
+        DOMTitle.insertAdjacentText("beforeend", header);
+        DOMTitle.setAttribute(
+            "href",
+            `${window.location.origin}/collection?t=${mediaType}&c=${collectionType}`
+        );
+
+        for (var dataItem of data) {
+            /**@type {HTMLButtonElement}*/
+            const DOMItem = DOMTItem.cloneNode(true)
+            DOMItem.setAttribute("data-id", dataItem.id);
+            let itemTitle;
+            /**@type {"movie"| "tv"} */
+            let itemMediaType;
+            if (mediaType !== "all") {
+                itemMediaType = mediaType;
+            } else {
+                itemMediaType = dataItem.media_type;
+            }
+            if (itemMediaType === "movie") {
+                itemTitle = dataItem.title;
+            } else {
+                itemTitle = dataItem.name;
+            }
+            DOMItem.setAttribute("title", itemTitle);
+            DOMItem.setAttribute(
+                "href",
+                Route.getHref(itemMediaType, dataItem.id)
+            );
+            DOMItem.setAttribute("data-media", itemMediaType);
+            DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
+
+            DOMItem.firstElementChild.setAttribute("alt", itemTitle);
+            View.setItemImage(
+                API.getImages(dataItem.id, itemMediaType),
+                DOMItem,
+                dataItem.backdrop_path
+            );
+            DOMCollection.lastElementChild.appendChild(DOMItem);
+        }
+        return DOMCollection;
+    },
+};
+
+const View = {
+    topScroll: 0,
     /**
     @type {(
         data: Promise<maybe<object>>,
@@ -466,56 +529,6 @@ const View = {
     },
     /**
     @type {(
-        header: string,
-        data: object,
-        mediaType: "movie" | "tv" | undefined,
-        DFCollection: DocumentFragment,
-    ) => HTMLElement}*/
-    createDOMCollection(
-        header,
-        data,
-        mediaType,
-        DFCollection
-    ) {
-        /**@type {HTMLElement}*/
-        var DOMCollection = DFCollection.children[1].cloneNode(true);
-        var DOMTItem = DFCollection.children[2];
-        //DOMCollection.children[0].insertAdjacentText("beforeend", header);
-        var DOMTitle = DOMCollection.children[0]
-        DOMTitle.insertAdjacentText("beforeend", header);
-        for (var dataItem of data) {
-            /**@type {HTMLButtonElement}*/
-            const DOMItem = DOMTItem.cloneNode(true)
-            DOMItem.setAttribute("data-id", dataItem.id);
-            let itemTitle;
-            /**@type {"movie"| "tv"} */
-            let itemMediaType;
-            if (mediaType !== undefined) {
-                itemMediaType = mediaType;
-            } else {
-                itemMediaType = dataItem.media_type;
-            }
-            if (itemMediaType === "movie") {
-                itemTitle = dataItem.title;
-            } else {
-                itemTitle = dataItem.name;
-            }
-            DOMItem.setAttribute("title", itemTitle);
-            DOMItem.setAttribute("data-media", itemMediaType);
-            DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
-
-            DOMItem.firstElementChild.setAttribute("alt", itemTitle);
-            View.setItemImage(
-                API.getImages(dataItem.id, itemMediaType),
-                DOMItem,
-                dataItem.backdrop_path
-            );
-            DOMCollection.lastElementChild.appendChild(DOMItem);
-        }
-        return DOMCollection;
-    },
-    /**
-    @type {(
         DataPromise: Promise<object>,
         title: string,
         mediaType: "movie" | "tv",
@@ -529,10 +542,11 @@ const View = {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = View.createDOMCollection(
+        var DOMColl = Collection.createDOMCollection(
             /*header*/          title,
             /*data*/            data.results,
             /*mediaType*/       mediaType,
+            /*collectionType*/  Collection.DISCOVER,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos = DOM.view.children[base + i];
@@ -540,12 +554,13 @@ const View = {
         DOMPos.remove();
     },
     /**
-    @type {(target: HTMLElement, DOM: DOM_T) => undefined} */
-    onclick(target, DOM) {
+    @type {(target: HTMLElement, DOM: DOM_T, e: Event) => undefined} */
+    onclick(target, DOM, e) {
         var type = target.getAttribute("data-type");
         if (type === TYPE.COLL_BUTTON) {
-            View.DOMCollButtonOnclick(target);
+            Collection.DOMCollButtonOnclick(target);
         } else if (type === TYPE.COLL_ITEM) {
+            e.preventDefault();
             var mediaType = target.getAttribute("data-media");
             var id = target.getAttribute("data-id");
             if (mediaType !== null && id !== null) {
@@ -599,7 +614,7 @@ const Modal = {
         if (data === undefined) {
             return;
         }
-        Modal.DOMMCreditsFill(data, DOMModalData, DFModal);
+        Modal.DOMMCreditsFill(data, mediaType, DOMModalData, DFModal);
         Modal.creditsLoaded = true;
     },
     /**
@@ -860,7 +875,7 @@ const Modal = {
             DOMContainer.appendChild(Modal.fragment);
         }
     },
-    DOMMCreditsFill(data, DOMModalData, DFModal) {
+    DOMMCreditsFill(data, mediaType, DOMModalData, DFModal) {
         var DOMCast = DOMModalData.children[3].children[5];
         var DOMCredits = DOMModalData.children[3].lastElementChild;
 
@@ -881,7 +896,15 @@ const Modal = {
 
             for (var i = 0; i < casts.length; i += 1) {
                 var cast = casts[i];
-                DOMItem = DOMTItem.cloneNode(false);
+                if (mediaType === "movie") {
+                    DOMItem = DOMTItem.cloneNode(false);
+                    DOMItem.setAttribute(
+                        "href",
+                        `${window.location.origin}/collection?t=${mediaType}&c=${Collection.DISCOVER}&ca=${cast.id}`
+                    );
+                } else {
+                    DOMItem = DOMTSpan.cloneNode(false);
+                }
                 DOMItem.setAttribute("data-id", cast.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
                 DOMItem.textContent = cast.name;
@@ -926,7 +949,8 @@ const Modal = {
                     DOMJob.firstElementChild.textContent = `${job}:`;
                 }
                 if (
-                    department === "Directing"
+                    mediaType === "movie"
+                    && department === "Directing"
                     && (
                         job === "Director"
                         || job === "Series Director"
@@ -934,6 +958,10 @@ const Modal = {
                     )
                 ) {
                     DOMItem = DOMTItem.cloneNode(true);
+                    DOMItem.setAttribute(
+                        "href",
+                        `${window.location.origin}/collection?t=${mediaType}&c=${Collection.DISCOVER}&cr=${cast.id}`
+                    );
                     DOMItem.setAttribute("data-id", crew.id);
                     DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
                 } else {
@@ -993,6 +1021,10 @@ const Modal = {
             for (var genre of data.genres) {
                 DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.textContent = genre.name;
+                DOMItem.setAttribute(
+                    "href",
+                    `${window.location.origin}/collection?t=movie&c=${Collection.DISCOVER}&g=${genre.id}`
+                );
                 DOMItem.setAttribute("data-id", genre.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
                 Modal.fragment.appendChild(DOMItem);
@@ -1044,8 +1076,12 @@ const Modal = {
             DOMPC.firstElementChild.textContent = "Companies:";
             for (var companies of data.production_companies) {
                 DOMItem = DOMTItem.cloneNode(true);
-                DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
-                DOMTItem.setAttribute("data-id", companies.id);
+                DOMItem.setAttribute(
+                    "href",
+                    `${window.location.origin}/collection?t=movie&c=${Collection.DISCOVER}&co=${companies.id}`
+                );
+                DOMItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                DOMItem.setAttribute("data-id", companies.id);
                 DOMItem.textContent = companies.name;
                 DOMPC.appendChild(DOMItem);
             }
@@ -1102,6 +1138,10 @@ const Modal = {
             for (var genre of data.genres) {
                 DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.textContent = genre.name;
+                DOMItem.setAttribute(
+                    "href",
+                    `${window.location.origin}/collection?t=tv&c=${Collection.DISCOVER}&g=${genre.id}`
+                );
                 DOMItem.setAttribute("data-id", genre.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
                 Modal.fragment.appendChild(DOMItem);
@@ -1153,8 +1193,12 @@ const Modal = {
             DOMPC.firstElementChild.textContent = "Companies:";
             for (var companies of data.production_companies) {
                 DOMItem = DOMTItem.cloneNode(true);
-                DOMTItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
-                DOMTItem.setAttribute("data-id", companies.id);
+                DOMItem.setAttribute(
+                    "href",
+                    `${window.location.origin}/collection?t=tv&c=${Collection.DISCOVER}&co=${companies.id}`
+                );
+                DOMItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
+                DOMItem.setAttribute("data-id", companies.id);
                 DOMItem.textContent = companies.name;
                 DOMPC.appendChild(DOMItem);
             }
@@ -1321,5 +1365,6 @@ export default {
     Route,
     View,
     Modal,
+    Collection,
     Utils,
 };

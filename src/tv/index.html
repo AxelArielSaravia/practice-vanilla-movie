@@ -25,6 +25,7 @@
     <link rel="icon" href="/media/icon-180.png"/>
     <link rel="apple-touch-icon" href="/media/icon-180.png"/>
     <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="collection.css">
     <link rel="stylesheet" href="hero.css">
     <link rel="stylesheet" href="tv.css">
     <script src="general.js" type="module"></script>
@@ -53,30 +54,15 @@
             <button id="header_button-nav" class="nav-button" type="button">
                 Tv Shows
             </button>
-            <ul id="header_nav" class="nav" data-mbshow="0" data-selected="2">
+            <ul id="header_nav" class="nav" data-mbshow="0">
                 <li class="nav-tab">
-                    <a
-                        href="/"
-                        class="nav-link"
-                        data-type="0"
-                        data-linkt="0"
-                    >Home</a>
+                    <a href="/" class="nav-link">Home</a>
                 </li>
                 <li class="nav-tab">
-                    <a
-                        href="/movie"
-                        class="nav-link"
-                        data-type="0"
-                        data-linkt="1"
-                    >Movies</a>
+                    <a href="/movie" class="nav-link">Movies</a>
                 </li>
                 <li class="nav-tab">
-                    <a
-                        href="/tv"
-                        class="nav-link"
-                        data-type="0"
-                        data-linkt="2"
-                    >TV Shows</a>
+                    <a href="/tv" class="nav-link selected">TV Shows</a>
                 </li>
             </ul>
         </nav>
@@ -150,8 +136,8 @@
                 <div class="hero-left-gradient"></div>
                 <div class="hero-bottom-gradient"></div>
             </div>
-            <button class="info" data-id="" data-media="">
-                <div class="logo">
+            <div class="info" data-id="" data-media="">
+                <a class="logo" href="">
                     <h2 data-opacity="1"></h2>
                     <img
                         src=""
@@ -159,9 +145,9 @@
                         alt="hero logo"
                         data-display="0"
                     />
-                </div>
+                </a>
                 <p class="description"></p>
-            </button>
+            </div>
         </section>
         <main id="view" class="view">
             <section class="collection-skeleton" data-pos="0">
@@ -333,11 +319,7 @@
         </section>
     <!--1 Collection-->
         <section class="collection">
-            <button
-                class="title"
-                data-type="4"
-                type="button"
-            ></button>
+            <a class="title" data-type="4" href=""></a>
             <button
                 class="b-scroll b-left"
                 data-type="5"
@@ -381,7 +363,7 @@
             <section class="slider"></section>
         </section>
     <!--2 Item-->
-        <button class="item" data-id="" data-type="6" data-media="">
+        <a class="item" data-id="" data-type="6" data-media="" href="">
             <img alt="" src="" data-display="0" loading="lazy">
             <svg
                 class="icon icon-video"
@@ -397,7 +379,7 @@
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
             </svg>
             <h3 data-opacity="1"></h3>
-        </button>
+        </a>
     </template>
     <template id="template_modal">
     <!--0 Item-->

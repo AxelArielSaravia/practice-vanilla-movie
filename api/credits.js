@@ -1,4 +1,3 @@
-
 import _utils from "./_utils.js";
 
 export const config = {
@@ -7,8 +6,8 @@ export const config = {
 
 export default async function handler(req) {
     var url = new URL(req.url);
-    var qtype = url.searchParams.get("type");
-    var qid = url.searchParams.get("id");
+    var qtype = url.searchParams.get("t");
+    var qid = url.searchParams.get("i");
     if ((qtype !== "movie" && qtype !== "tv") || qid === null) {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }

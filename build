@@ -24,7 +24,6 @@ if [ ! -d $dir ]; then
     mkdir $dir
     echo Create $dir
 fi
-
 if [ ! -d "$dir/movie" ]; then
     mkdir "$dir/movie"
     echo Create "$dir/movie"
@@ -33,7 +32,12 @@ if [ ! -d "$dir/tv" ]; then
     mkdir "$dir/tv"
     echo Create "$dir/tv"
 fi
+if [ ! -d "$dir/collection" ]; then
+    mkdir "$dir/collection"
+    echo Create "$dir/collection"
+fi
 
+#Home
 bun build ./src/main.js --outdir $dir --minify --external '*'
 echo JS Build main.js Successful
 
@@ -43,25 +47,35 @@ echo index.html minified success
 minify -o $dir/style.css ./src/style.css
 echo style.css minified success
 
+minify -o $dir/collection.css ./src/collection.css
+echo collection.css minified success
+
 minify -o $dir/hero.css ./src/hero.css
 echo hero.css minified success
 
 minify -o $dir/tv.css ./src/tv.css
 echo tv.css minified success
 
-
+#Tv
 bun build ./src/tv/main.js --outdir $dir/tv --minify --external '*'
 echo JS Build /tv/main.js Successful
 
 minify -o $dir/tv/index.html ./src/tv/index.html --html-keep-end-tags
 echo /tv/index.html minified success
 
-
+#Movie
 bun build ./src/movie/main.js --outdir $dir/movie --minify --external '*'
 echo JS Build /movie/main.js Successful
 
 minify -o $dir/movie/index.html ./src/movie/index.html --html-keep-end-tags
 echo /movie/index.html minified success
+
+#Collection
+minify -o $dir/collection/index.html ./src/collection/index.html --html-keep-end-tags
+echo /collection/index.html minified success
+
+minify -o $dir/collection/style.css ./src/collection/style.css
+echo /collection/style.css minified success
 
 
 if [ $media = 1 ]; then
