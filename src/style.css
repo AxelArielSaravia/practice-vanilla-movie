@@ -624,7 +624,7 @@ footer a {
     display: none !important;
 }
 
-.modal .content .jobs[data-more="0"] .item:nth-child(n + 5) {
+.modal .content .jobs[data-more="0"] :is(.text,.item):nth-child(n + 5) {
     display: none;
 }
 
