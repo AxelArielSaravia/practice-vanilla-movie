@@ -41,6 +41,9 @@ fi
 bun build ./src/main.js --outdir $dir --minify --external '*'
 echo JS Build main.js Successful
 
+bun build ./src/general.js --outdir $dir --minify --external '*'
+echo JS Build general.js Successful
+
 minify -o $dir/index.html ./src/index.html --html-keep-end-tags
 echo index.html minified success
 
