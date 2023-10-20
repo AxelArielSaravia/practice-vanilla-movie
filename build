@@ -74,6 +74,9 @@ echo modal.css minified success
 minify -o $dir/modal-tv.css ./src/modal-tv.css
 echo modal-tv.css minified success
 
+minify -o $dir/discover.css ./src/discover.css
+echo discover.css minified success
+
 
 #Tv
 bun build ./src/tv/main.js --outdir $dir/tv --minify --external '*'
