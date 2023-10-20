@@ -21,21 +21,21 @@
     >
     <meta name="keywords" content="fake, movie, vanilla, javascript">
     <meta name="canonical" href="https://aas-vanilla-movie.web.app">
-    <title>The Fake App</title>
+    <title>The Fake App - Popular</title>
     <link rel="icon" href="/media/icon-180.png">
     <link rel="apple-touch-icon" href="/media/icon-180.png">
     <link rel="stylesheet" href="general.css">
-    <link rel="stylesheet" href="collection.css">
     <link rel="stylesheet" href="hero.css">
     <link rel="stylesheet" href="modal.css">
     <link rel="stylesheet" href="modal-tv.css">
+    <link rel="stylesheet" href="discover.css">
     <script src="general.js" type="module"></script>
-    <script src="main.js" type="module"></script>
+    <script src="/popular/main.js" type="module"></script>
 </head>
 <body>
     <header class="header" role="navigation">
-        <h1 class="visual-hidden">Vanilla Movie fake app</h1>
-        <a class="logo" aria-label="Fake" href="/" rel="noreferer noopener">
+        <h1 class="visual-hidden">Vanilla Movie fake app - Popular</h1>
+        <a class="logo" aria-label="Fake" href="/">
             <svg
                 class="icon icon-logo"
                 viewBox="0 0 104.70643000324641 36.00000000000001"
@@ -51,15 +51,15 @@
                 </g>
             </svg>
         </a>
-       <nav id="header_p_nav" class="primary-nav">
+        <nav id="header_p_nav" class="primary-nav">
             <button class="nav-button" type="button">
-                Home
+                Popular
             </button>
             <ul class="nav" data-mbshow="0">
                 <li class="nav-tab">
                     <a
                         href="/"
-                        class="nav-link selected"
+                        class="nav-link"
                         target="_self"
                         rel="noreferer noopener"
                         data-type="0"
@@ -149,145 +149,37 @@
             </button>
         </div>
     </header>
-    <div id="main" class="collections-main" style="position:relative">
-        <section id="hero" class="hero">
-            <div class="background">
-                <img
-                    src=""
-                    loading="lazy"
-                    alt="hero background"
-                    data-display="0"
-                />
-                <div class="hero-left-gradient"></div>
-                <div class="hero-bottom-gradient"></div>
-            </div>
-            <div class="info">
-                <a
-                    id="hero-title"
-                    class="logo"
-                    href=""
-                    rel="noreferer noopener"
-                    data-id=""
-                    data-media=""
-                >
-                    <h2 data-opacity="1"></h2>
-                    <img
-                        src=""
-                        loading="lazy"
-                        alt="hero logo"
-                        data-display="0"
-                    />
-                </a>
-                <p class="description"></p>
-            </div>
-        </section>
-        <main id="view" class="view">
-            <section class="collection-skeleton" data-pos="0">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="1">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="2">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="3">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="4">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="5">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-            <section class="collection-skeleton" data-pos="6">
-                <h2 class="title">Loading</h2>
-                <section class="slider">
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                    <div class="item"></div>
-                </section>
-            </section>
-        </main>
-        <button
-            id="button-more"
-            class="more"
-            type="button"
-            data-display="0"
-        >
-            More
-        </button>
-        <footer>
-            <p class="social">
-                <span>
-                    create by
-                    <a
-                       href="https://github.com/AxelArielSaravia/"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                    >Axel Ariel Saravia</a>
-                </span>
-            </p>
-        </footer>
-    </div>
+    <main id="main">
+        <h2 class="title">Popular</h2>
+        <div class="view">
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
+    </main>
+    <button
+        id="button-more"
+        class="more"
+        type="button"
+        data-display="0"
+    >
+        More
+    </button>
+    <footer>
+        <p class="social">
+        <span>
+            create by
+            <a
+               href="https://github.com/AxelArielSaravia/"
+               target="_blank"
+               rel="noreferrer noopener"
+            >Axel Ariel Saravia</a>
+        </span>
+        </p>
+    </footer>
     <div
         id="modal"
         class="modal"
@@ -371,67 +263,16 @@
             </div>
         </article>
     </div>
-    <template id="template_collection">
-     <!--0 Skeleton-->
-        <section class="collection-skeleton">
-            <h2 class="title">Loading</h2>
-            <section class="slider">
-                <div class="item"></div>
-                <div class="item"></div>
-                <div class="item"></div>
-                <div class="item"></div>
-                <div class="item"></div>
-                <div class="item"></div>
-                <div class="item"></div>
-            </section>
-        </section>
-    <!--1 Collection-->
-        <section class="collection">
-            <a class="title" data-type="4" href=""></a>
-            <button
-                class="b-scroll b-left"
-                data-type="5"
-                data-sbuttont="0"
-                data-display="0"
-                type="button"
-            >
-                <svg
-                    class="icon icon-chevron-left"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-            </button>
-            <button
-                class="b-scroll b-right"
-                data-type="5"
-                data-sbuttont="1"
-                data-display="1"
-                type="button"
-            >
-                <svg
-                    class="icon icon-chevron-left"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <polyline points="9 18 15 12 9 6">
-                </svg>
-            </button>
-            <section class="slider"></section>
-        </section>
-    <!--2 Item-->
-        <a class="item" data-id="" data-type="6" data-media="" href="" rel="noreferer noopener">
+    <template id="template_skeleton">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+    </template>
+    <template id="template_item">
+        <button class="item" data-id="" data-type="6" data-media="">
             <img alt="" src="" data-display="0" loading="lazy">
             <svg
                 class="icon icon-video"
@@ -447,11 +288,11 @@
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
             </svg>
             <h3 data-opacity="1"></h3>
-        </a>
+        </button>
     </template>
     <template id="template_modal">
     <!--0 Item-->
-        <a class="item" href="" data-id="" data-type="" rel="noreferer noopener"></a>
+        <a class="item" href="" data-id="" data-type=""></a>
     <!--1 Credits Department-->
         <section class="department">
             <h4></h4>

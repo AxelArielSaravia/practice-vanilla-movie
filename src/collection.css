@@ -1,11 +1,3 @@
-/*Main*/
-#main {
-    flex-grow: 1;
-    position: relative;
-    min-height: 1000px;
-    margin-top: var(--main-margin-top);
-}
-
 /*Collection*/
 :is(.collection,.collection-skeleton) {
     --left-bg: linear-gradient(90deg,var(--color-primary) 10%,transparent);
@@ -19,7 +11,9 @@
     margin: 0 var(--padding-inline) 10px;
     font-size: 1.6rem;
     font-weight: 600;
-    border-bottom: 1px solid transparent;
+}
+.collection a {
+    text-decoration: none;
 }
 
 .collection .title::after {
@@ -39,6 +33,7 @@
     display: flex;
     gap: 0 5px;
     scroll-behavior: smooth;
+    padding: var(--padding-block) var(--padding-inline);
 }
 
 .collection-skeleton .slider {
@@ -151,9 +146,6 @@
         top: 0;
         left: 0;
     }
-    :is(.collection,.collection-skeleton) .slider {
-        padding: var(--padding-block) var(--padding-inline);
-    }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -203,9 +195,6 @@
     }
     .collection .b-scroll {
         display: none;
-    }
-    :is(.collection,.collection-skeleton) .slider {
-        padding: 0 var(--padding-inline);
     }
 }
 

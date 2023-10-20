@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
         name="theme-color"
         media="(prefers-color-scheme: light)"
@@ -21,18 +21,20 @@
     >
     <meta name="keywords" content="fake, movie, vanilla, javascript">
     <meta name="canonical" href="https://aas-vanilla-movie.web.app">
-    <title>The Fake App</title>
+    <title>The Fake App - Top Rated</title>
     <link rel="icon" href="/media/icon-180.png">
     <link rel="apple-touch-icon" href="/media/icon-180.png">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="/collection/style.css">
+    <link rel="stylesheet" href="general.css">
     <link rel="stylesheet" href="hero.css">
-    <link rel="stylesheet" href="tv.css">
+    <link rel="stylesheet" href="modal.css">
+    <link rel="stylesheet" href="modal-tv.css">
+    <link rel="stylesheet" href="discover.css">
     <script src="general.js" type="module"></script>
+    <script src="/top_rated/main.js" type="module"></script>
 </head>
 <body>
     <header class="header" role="navigation">
-        <h1 class="visual-hidden">Vanilla Movie fake app</h1>
+        <h1 class="visual-hidden">Vanilla Movie fake app - Top Rated</h1>
         <a class="logo" aria-label="Fake" href="/">
             <svg
                 class="icon icon-logo"
@@ -49,22 +51,44 @@
                 </g>
             </svg>
         </a>
-        <nav class="primary-nav">
-            <button id="header_button-nav" class="nav-button" type="button">
-                Collection
+        <nav id="header_p_nav" class="primary-nav">
+            <button class="nav-button" type="button">
+                Top Rated
             </button>
-            <ul id="header_nav" class="nav" data-mbshow="0" data-selected="0">
-            <ul id="header_nav" class="nav" data-mbshow="0">
+            <ul class="nav" data-mbshow="0">
                 <li class="nav-tab">
-                    <a href="/" class="nav-link">Home</a>
+                    <a
+                        href="/"
+                        class="nav-link"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Home
+                    </a>
                 </li>
                 <li class="nav-tab">
-                    <a href="/movie" class="nav-link">Movies</a>
+                    <a
+                        href="/movie"
+                        class="nav-link"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Movies
+                    </a>
                 </li>
                 <li class="nav-tab">
-                    <a href="/tv" class="nav-link">TV Shows</a>
+                    <a
+                        href="/tv"
+                        class="nav-link"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Tv Shows
+                    </a>
                 </li>
-            </ul>
             </ul>
         </nav>
         <div class="secondary-nav">
@@ -125,17 +149,16 @@
             </button>
         </div>
     </header>
-    <main id="view" class="view">
-        <h2 class="title">Loading</h2>
-        <section class="skeleton">
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </section>
+    <main id="main">
+        <h2 class="title">Top Rated</h2>
+        <div class="view">
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </div>
     </main>
     <button
         id="button-more"
@@ -241,17 +264,14 @@
         </article>
     </div>
     <template id="template_skeleton">
-        <section class="skeleton">
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-            <div class="item"></div>
-        </section>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
     </template>
-    <template id="template_Item">
+    <template id="template_item">
         <button class="item" data-id="" data-type="6" data-media="">
             <img alt="" src="" data-display="0" loading="lazy">
             <svg

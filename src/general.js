@@ -157,13 +157,25 @@ const API = {
     /**
     @type {(
         type: "movie" | "tv",
-        genre: number,
-        page: string
+        page: string,
+        genre: undefined | number,
+        cast: undefined | string,
+        crew: undefined | string,
+        company: undefined | string,
     ) => Promise<maybe<MDBResponse<MDBDiscover>>>}*/
-    getDiscover(type, genre, page = "1") {
+    getDiscover(type, page = "1", genre, cast, crew, company) {
         var p = `${window.location.origin}/api/discover?t=${type}&p=${page}`;
         if (genre !== undefined) {
             p = `${p}&g=${genre}`;
+        }
+        if (cast !== undefined) {
+            p = `${p}&ca=${cast}`;
+        }
+        if (crew !== undefined) {
+            p = `${p}&cr=${crew}`;
+        }
+        if (company !== undefined) {
+            p = `${p}&co=${company}`;
         }
         return fetch(p).then(fetchResolve);
     },
@@ -232,8 +244,6 @@ const Nav = {
             DOMNav.setAttribute(Nav.ATTR_SHOW, Nav.SHOW);
             //First nav-link element
             DOMNav.firstElementChild.firstElementChild.focus();
-        } else {
-            DOMNav.setAttribute(Nav.ATTR_SHOW, Nav.HIDDEN);
         }
     },
     //hidde nav menu if the focus is out of the nav menu of the 
@@ -309,11 +319,11 @@ const Hero = {
         var DOMImgBg = DOMHero.firstElementChild.firstElementChild;
         /**@type {HTMLElement}*/
         var DOMInfo = DOMHero.lastElementChild;
+        var DOMTitle = DOMInfo.firstElementChild;
         /**@type {HTMLElement}*/
-        var DOMHLogo = DOMInfo.firstElementChild.firstElementChild;
+        var DOMHLogo = DOMTitle.firstElementChild;
         /**@type {HTMLParamElement}*/
         var DOMDescription = DOMInfo.lastElementChild;
-
         DOMImgBg.setAttribute("data-display", "1");
         DOMImgBg.setAttribute(
             "src",
@@ -325,31 +335,48 @@ const Hero = {
         } else {
             DOMHLogo.insertAdjacentText("beforeend",hero.title);
         }
-        DOMInfo.setAttribute("href", Route.getHref(hero.media_type, hero.id));
-        DOMInfo.setAttribute("data-media", hero.media_type);
-        DOMInfo.setAttribute("data-id", hero.id);
+        DOMTitle.setAttribute("href", Route.getHref(hero.media_type, hero.id));
+        DOMTitle.setAttribute("data-media", hero.media_type);
+        DOMTitle.setAttribute("data-id", hero.id);
 
-        DOMDescription.insertAdjacentText("beforeend",hero.overview);
+        if (hero.overview !== undefined) {
+            if (hero.overview.length > 300) {
+                var spaceIndex = hero.overview.lastIndexOf(" ", 300);
+                var heroOverview = `${hero.overview.substring(0, spaceIndex)}...`;
+                DOMDescription.insertAdjacentText("beforeend",heroOverview);
+            } else {
+                DOMDescription.insertAdjacentText("beforeend",hero.overview);
+            }
+        }
     },
     /**
     @type {(target: HTMLElement, DOM: DOM_T, e: Event) => undefined} */
     DOMTitleOnclick(target, DOM, e) {
+        e.preventDefault();
         var id = target.getAttribute("data-id");
         var mediaType = target.getAttribute("data-media");
         if (id !== null && mediaType !== null)  {
-            e.preventDefault();
             Modal.open(mediaType, id, DOM, true);
         }
     }
 };
 
 const Route = {
+    Q_TITLE: "tl",
+    Q_MEDIA_TYPE: "t",
+    Q_GENRE: "g",
+    Q_CREW: "cr",
+    Q_CAST: "ca",
+    Q_COMPANY: "co",
+    Q_ID: "i",
+
     url: new URL(window.location.href),
     origin: `${window.location.origin}${window.location.pathname}`,
+
     /**
     @type {(type: "movie" | "tv", id: string) => string} */
     getHref(type, id) {
-        return `${Route.origin}?t=${type}&i=${id}`;
+        return `${Route.origin}?${Route.Q_MEDIA_TYPE}=${type}&${Route.Q_ID}=${id}`;
     },
     /**
     @type {(route: string) => undefined} */
@@ -359,8 +386,8 @@ const Route = {
     /**
     @type {(DOM: DOM_T) => undefined} */
     init(DOM) {
-        var qtype = Route.url.searchParams.get("t");
-        var qid = Route.url.searchParams.get("i");
+        var qtype = Route.url.searchParams.get(Route.Q_MEDIA_TYPE);
+        var qid = Route.url.searchParams.get(Route.Q_ID);
         if (qtype !== null && qid !== null) {
             if (qtype == "tv" || qtype == "movie") {
                 Modal.open(qtype, qid, DOM, false);
@@ -387,6 +414,7 @@ const Route = {
         }
     }
 };
+
 
 const Collection = {
     TYPE_SBUTTON: "data-sbuttont",
@@ -436,6 +464,7 @@ const Collection = {
         data: object,
         mediaType: "movie" | "tv" | "all",
         collectionType: "0" | "1" | "2" | "3",
+        genreId: undefined | string,
         DFCollection: DocumentFragment,
     ) => HTMLElement}*/
     createDOMCollection(
@@ -443,6 +472,7 @@ const Collection = {
         data,
         mediaType,
         collectionType,
+        genreId,
         DFCollection
     ) {
         /**@type {HTMLElement}*/
@@ -451,11 +481,30 @@ const Collection = {
 
         var DOMTitle = DOMCollection.children[0]
         DOMTitle.insertAdjacentText("beforeend", header);
-        DOMTitle.setAttribute(
-            "href",
-            `${window.location.origin}/collection?t=${mediaType}&c=${collectionType}`
-        );
 
+        if (collectionType === Collection.TRENDING) {
+            DOMTitle.setAttribute(
+                "href",
+                `${window.location.origin}/trending?${Route.Q_MEDIA_TYPE}=${mediaType}`
+            );
+        } else if (collectionType === Collection.POPULAR) {
+            DOMTitle.setAttribute(
+                "href",
+                `${window.location.origin}/popular?${Route.Q_MEDIA_TYPE}=${mediaType}`
+            );
+        } else if (collectionType === Collection.TOP_RATED) {
+            DOMTitle.setAttribute(
+                "href",
+                `${window.location.origin}/top_rated?${Route.Q_MEDIA_TYPE}=${mediaType}`
+            );
+        } else if (collectionType === Collection.DISCOVER) {
+            if (genreId !== undefined) {
+                DOMTitle.setAttribute(
+                    "href",
+                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=${mediaType}&${Route.Q_GENRE}=${genreId}&${Route.Q_TITLE}=${encodeURIComponent(header)}`
+                );
+            }
+        }
         for (var dataItem of data) {
             /**@type {HTMLButtonElement}*/
             const DOMItem = DOMTItem.cloneNode(true)
@@ -532,11 +581,12 @@ const View = {
         DataPromise: Promise<object>,
         title: string,
         mediaType: "movie" | "tv",
+        genre: undefined | string,
         i: number,       //relavie index of the DOM children
         base: number,   //absolute index of the first DOM children
         DOM: DOM_T
     ) => Promise<undefined>} */
-    async discover(DataPromise, title, mediaType, i, base, DOM) {
+    async discover(DataPromise, title, mediaType, genre, i, base, DOM) {
         var data = await DataPromise;
         console.info(title, data);
         if (data?.results === undefined || data.results.length === 0) {
@@ -547,6 +597,7 @@ const View = {
             /*data*/            data.results,
             /*mediaType*/       mediaType,
             /*collectionType*/  Collection.DISCOVER,
+            /*genreId*/         genre,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos = DOM.view.children[base + i];
@@ -900,7 +951,7 @@ const Modal = {
                     DOMItem = DOMTItem.cloneNode(false);
                     DOMItem.setAttribute(
                         "href",
-                        `${window.location.origin}/collection?t=${mediaType}&c=${Collection.DISCOVER}&ca=${cast.id}`
+                        `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=${mediaType}&${Route.Q_CAST}=${cast.id}&${Route.Q_TITLE}=${cast.name} Movies`
                     );
                 } else {
                     DOMItem = DOMTSpan.cloneNode(false);
@@ -960,7 +1011,7 @@ const Modal = {
                     DOMItem = DOMTItem.cloneNode(true);
                     DOMItem.setAttribute(
                         "href",
-                        `${window.location.origin}/collection?t=${mediaType}&c=${Collection.DISCOVER}&cr=${cast.id}`
+                        `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=${mediaType}&${Route.Q_CREW}=${crew.id}&${Route.Q_TITLE}=${crew.name} Movies`
                     );
                     DOMItem.setAttribute("data-id", crew.id);
                     DOMItem.setAttribute("data-type", TYPE.MODAL_CAST);
@@ -1023,7 +1074,7 @@ const Modal = {
                 DOMItem.textContent = genre.name;
                 DOMItem.setAttribute(
                     "href",
-                    `${window.location.origin}/collection?t=movie&c=${Collection.DISCOVER}&g=${genre.id}`
+                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=movie&${Route.Q_GENRE}=${genre.id}&${Route.Q_TITLE}=${encodeURIComponent(genre.name)} Movies`
                 );
                 DOMItem.setAttribute("data-id", genre.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
@@ -1078,7 +1129,7 @@ const Modal = {
                 DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.setAttribute(
                     "href",
-                    `${window.location.origin}/collection?t=movie&c=${Collection.DISCOVER}&co=${companies.id}`
+                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=movie&${Route.Q_COMPANY}=${companies.id}&${Route.Q_TITLE}=${encodeURIComponent(companies.name)} Movies`
                 );
                 DOMItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
                 DOMItem.setAttribute("data-id", companies.id);
@@ -1140,7 +1191,7 @@ const Modal = {
                 DOMItem.textContent = genre.name;
                 DOMItem.setAttribute(
                     "href",
-                    `${window.location.origin}/collection?t=tv&c=${Collection.DISCOVER}&g=${genre.id}`
+                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=tv&${Route.Q_GENRE}=${genre.id}&${Route.Q_TITLE}=${encodeURIComponent(genre.name)} Tv Series`
                 );
                 DOMItem.setAttribute("data-id", genre.id);
                 DOMItem.setAttribute("data-type", TYPE.MODAL_GENRE);
@@ -1195,7 +1246,7 @@ const Modal = {
                 DOMItem = DOMTItem.cloneNode(true);
                 DOMItem.setAttribute(
                     "href",
-                    `${window.location.origin}/collection?t=tv&c=${Collection.DISCOVER}&co=${companies.id}`
+                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=tv&${Route.Q_COMPANY}=${companies.id}&${Route.Q_TITLE}=${encodeURIComponent(companies.name)} Tv Series`
                 );
                 DOMItem.setAttribute("data-type", TYPE.MODAL_COMPANY);
                 DOMItem.setAttribute("data-id", companies.id);

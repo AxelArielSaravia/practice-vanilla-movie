@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
         name="theme-color"
         media="(prefers-color-scheme: light)"
@@ -24,9 +24,10 @@
     <title>The Fake App - Movies</title>
     <link rel="icon" href="/media/icon-180.png"/>
     <link rel="apple-touch-icon" href="/media/icon-180.png"/>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="general.css"/>
     <link rel="stylesheet" href="collection.css">
     <link rel="stylesheet" href="hero.css">
+    <link rel="stylesheet" href="modal.css">
     <script src="general.js" type="module"></script>
     <script src="/movie/main.js" type="module"></script>
 </head>
@@ -49,19 +50,43 @@
                 </g>
             </svg>
         </a>
-        <nav class="primary-nav">
-            <button id="header_button-nav" class="nav-button" type="button">
+        <nav id="header_p_nav" class="primary-nav">
+            <button class="nav-button" type="button">
                 Movie
             </button>
-            <ul id="header_nav" class="nav" data-mbshow="0">
+            <ul class="nav" data-mbshow="0">
                 <li class="nav-tab">
-                    <a href="/" class="nav-link">Home</a>
+                    <a
+                        href="/"
+                        class="nav-link"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Home
+                    </a>
                 </li>
                 <li class="nav-tab">
-                    <a href="/movie" class="nav-link selected">Movies</a>
+                    <a
+                        href="/movie"
+                        class="nav-link selected"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Movies
+                    </a>
                 </li>
                 <li class="nav-tab">
-                    <a href="/tv" class="nav-link">TV Shows</a>
+                    <a
+                        href="/tv"
+                        class="nav-link"
+                        target="_self"
+                        rel="noreferer noopener"
+                        data-type="0"
+                    >
+                        Tv Shows
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -123,7 +148,7 @@
             </button>
         </div>
     </header>
-    <div id="main" style="position:relative">
+    <div id="main" class="collections-main" style="position:relative">
         <section id="hero" class="hero">
             <div class="background">
                 <img
@@ -135,8 +160,15 @@
                 <div class="hero-left-gradient"></div>
                 <div class="hero-bottom-gradient"></div>
             </div>
-            <div class="info" data-id="" data-media="">
-                <a class="logo" href="">
+            <div class="info">
+                <a
+                    id="hero-title"
+                    class="logo"
+                    href=""
+                    rel="noreferer noopener"
+                    data-id=""
+                    data-media=""
+                >
                     <h2 data-opacity="1"></h2>
                     <img
                         src=""

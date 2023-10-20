@@ -32,9 +32,21 @@ if [ ! -d "$dir/tv" ]; then
     mkdir "$dir/tv"
     echo Create "$dir/tv"
 fi
-if [ ! -d "$dir/collection" ]; then
-    mkdir "$dir/collection"
-    echo Create "$dir/collection"
+if [ ! -d "$dir/discover" ]; then
+    mkdir "$dir/discover"
+    echo Create "$dir/discover"
+fi
+if [ ! -d "$dir/popular" ]; then
+    mkdir "$dir/popular"
+    echo Create "$dir/popular"
+fi
+if [ ! -d "$dir/top_rated" ]; then
+    mkdir "$dir/top_rated"
+    echo Create "$dir/top_rated"
+fi
+if [ ! -d "$dir/trending" ]; then
+    mkdir "$dir/trending"
+    echo Create "$dir/trending"
 fi
 
 #Home
@@ -47,8 +59,8 @@ echo JS Build general.js Successful
 minify -o $dir/index.html ./src/index.html --html-keep-end-tags
 echo index.html minified success
 
-minify -o $dir/style.css ./src/style.css
-echo style.css minified success
+minify -o $dir/general.css ./src/general.css
+echo general.css minified success
 
 minify -o $dir/collection.css ./src/collection.css
 echo collection.css minified success
@@ -56,8 +68,12 @@ echo collection.css minified success
 minify -o $dir/hero.css ./src/hero.css
 echo hero.css minified success
 
-minify -o $dir/tv.css ./src/tv.css
-echo tv.css minified success
+minify -o $dir/modal.css ./src/modal.css
+echo modal.css minified success
+
+minify -o $dir/modal-tv.css ./src/modal-tv.css
+echo modal-tv.css minified success
+
 
 #Tv
 bun build ./src/tv/main.js --outdir $dir/tv --minify --external '*'
@@ -66,6 +82,7 @@ echo JS Build /tv/main.js Successful
 minify -o $dir/tv/index.html ./src/tv/index.html --html-keep-end-tags
 echo /tv/index.html minified success
 
+
 #Movie
 bun build ./src/movie/main.js --outdir $dir/movie --minify --external '*'
 echo JS Build /movie/main.js Successful
@@ -73,12 +90,38 @@ echo JS Build /movie/main.js Successful
 minify -o $dir/movie/index.html ./src/movie/index.html --html-keep-end-tags
 echo /movie/index.html minified success
 
-#Collection
-minify -o $dir/collection/index.html ./src/collection/index.html --html-keep-end-tags
-echo /collection/index.html minified success
 
-minify -o $dir/collection/style.css ./src/collection/style.css
-echo /collection/style.css minified success
+#Discover
+bun build ./src/discover/main.js --outdir $dir/discover --minify --external '*'
+echo JS Build /discover/main.js Successful
+
+minify -o $dir/discover/index.html ./src/discover/index.html --html-keep-end-tags
+echo /discover/index.html minified success
+
+
+#Popular
+bun build ./src/popular/main.js --outdir $dir/popular --minify --external '*'
+echo JS Build /popular/main.js Successful
+
+minify -o $dir/popular/index.html ./src/popular/index.html --html-keep-end-tags
+echo /popular/index.html minified success
+
+
+#Top Rated
+bun build ./src/top_rated/main.js --outdir $dir/top_rated --minify --external '*'
+echo JS Build /top_rated/main.js Successful
+
+minify -o $dir/top_rated/index.html ./src/top_rated/index.html --html-keep-end-tags
+echo /top_rated/index.html minified success
+
+
+#Trending
+bun build ./src/trending/main.js --outdir $dir/trending --minify --external '*'
+echo JS Build /trending/main.js Successful
+
+minify -o $dir/trending/index.html ./src/trending/index.html --html-keep-end-tags
+echo /trending/index.html minified success
+
 
 
 if [ $media = 1 ]; then

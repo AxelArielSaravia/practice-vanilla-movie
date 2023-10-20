@@ -43,8 +43,17 @@ function staticResponse(req, reqPath) {
     if (reqPath === "/tv") {
         reqPath = "/tv/index.html";
     }
-    if (reqPath === "/collection") {
-        reqPath = "/collection/index.html"
+    if (reqPath === "/discover") {
+        reqPath = "/discover/index.html"
+    }
+    if (reqPath === "/popular") {
+        reqPath = "/popular/index.html"
+    }
+    if (reqPath === "/top_rated") {
+        reqPath = "/top_rated/index.html"
+    }
+    if (reqPath === "/trending") {
+        reqPath = "/trending/index.html"
     }
 
     let extension = path.extname(reqPath);

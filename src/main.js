@@ -63,15 +63,23 @@ function collectionsFill(DOM) {
             genre = tvGenres[itv].id;
             genreName = tvGenres[itv].name;
             mediaType = "tv";
-            title = `${genreName} Tv series`;
+            title = `${genreName} Tv Series`;
             itv += 1;
             CollectionState.itv += 1;
         }
         CollectionState.count += 1;
         _.View.discover(
-            _.API.getDiscover(mediaType, genre, "1"),
+            _.API.getDiscover(
+                /*mediaType*/   mediaType,
+                /*page*/        "1",
+                /*genre*/       genre,
+                /*cast*/        undefined,
+                /*crew*/        undefined,
+                /*company*/     undefined
+            ),
             title,
             mediaType,
+            genre,
             i,
             DOM.view.children.length - end,
             DOM
@@ -88,13 +96,13 @@ window.addEventListener("DOMContentLoaded", function () {
         templateCollection: document.getElementById("template_collection"),
         templateModal: document.getElementById("template_modal"),
         //header
-        headerButtonNav: document.getElementById("header_button-nav"),
-        headerNav: document.getElementById("header_nav"),
+        headerPNav: document.getElementById("header_p_nav"),
         headerButtonSearch: document.getElementById("header_button-search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
         //main
         main: document.getElementById("main"),
         hero: document.getElementById("hero"),
+        heroTitle: document.getElementById("hero-title"),
         view: document.getElementById("view"),
         buttonMore: document.getElementById("button-more"),
         //modal
@@ -107,11 +115,8 @@ window.addEventListener("DOMContentLoaded", function () {
     if (DOM.templateModal === null) {
         throw Error("DOM.templateModal is null");
     }
-    if (DOM.headerButtonNav === null) {
-        throw Error("DOM.headerButtonNav is null");
-    }
-    if (DOM.headerNav === null) {
-        throw Error("DOM.headerNav is null");
+    if (DOM.headerPNav === null) {
+        throw Error("DOM.headerPNav is null");
     }
     if (DOM.headerButtonSearch === null) {
         throw Error("DOM.headerButtonSearch is null");
@@ -124,6 +129,9 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     if (DOM.hero === null) {
         throw Error("DOM.hero is null");
+    }
+    if (DOM.heroTitle === null) {
+        throw Error("DOM.heroTitle is null");
     }
     if (DOM.view === null) {
         throw Error("DOM.view is null");
@@ -149,14 +157,14 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerButtonTheme.setAttribute("data-type", _.Theme.current);
     DOM.headerButtonTheme.addEventListener("click", _.Theme.onclick);
 
-    DOM.headerButtonNav.addEventListener("click", _.Nav.buttonNavOnclick);
-    DOM.headerNav.addEventListener("focusout", _.Nav.navOnfocusout);
+    DOM.headerPNav.firstElementChild.addEventListener("click", _.Nav.buttonNavOnclick);
+    DOM.headerPNav.lastElementChild.addEventListener("focusout", _.Nav.navOnfocusout);
 
     DOM.view.addEventListener("click", function (e) {
         _.View.onclick(e.target, DOM, e);
     });
 
-    DOM.hero.lastElementChild.addEventListener("click", function (e) {
+    DOM.heroTitle.addEventListener("click", function (e) {
         _.Hero.DOMTitleOnclick(e.target, DOM, e);
     });
 
@@ -202,6 +210,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*data*/            data.results,
             /*mediaType*/       "all",
             /*collectionType*/  _.Collection.TRENDING,
+            /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos0 = DOM.view.children[0];
@@ -219,6 +228,7 @@ window.addEventListener("DOMContentLoaded", function () {
             /*data*/            data.results,
             /*mediaType*/       "movie",
             /*collectionType*/  _.Collection.POPULAR,
+            /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos1 = DOM.view.children[1];
@@ -232,10 +242,11 @@ window.addEventListener("DOMContentLoaded", function () {
             throw Error("API.getDiscover does not have data");
         }
         var DOMColl = _.Collection.createDOMCollection(
-            /*header*/          "Popular Tv series",
+            /*header*/          "Popular Tv Series",
             /*data*/            data.results,
             /*mediaType*/       "tv",
             /*collectionType*/  _.Collection.POPULAR,
+            /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos2 = DOM.view.children[2];
@@ -249,10 +260,11 @@ window.addEventListener("DOMContentLoaded", function () {
             throw Error("API.getTopRated does not have data");
         }
         var DOMColl = _.Collection.createDOMCollection(
-            /*header*/          "Top rated movie",
+            /*header*/          "Top Rated Movie",
             /*data*/            data.results,
             /*mediaType*/       "movie",
             /*collectionType*/  _.Collection.TOP_RATED,
+            /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos3 = DOM.view.children[3];
@@ -266,11 +278,12 @@ window.addEventListener("DOMContentLoaded", function () {
             throw Error("API.getTopRated does not have data");
         }
         var DOMColl = _.Collection.createDOMCollection(
-            /*header*/          "Top rated tv serie",
+            /*header*/          "Top Rated Tv Serie",
             /*data*/            data.results,
             /*mediaType*/       "tv",
             /*collectionType*/  _.Collection.TOP_RATED,
-            /*DFCollection*/  DOM.templateCollection.content,
+            /*genreId*/         undefined,
+            /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos4 = DOM.view.children[4];
         DOMPos4.insertAdjacentElement("beforebegin", DOMColl);
@@ -337,14 +350,22 @@ window.addEventListener("DOMContentLoaded", function () {
                 genre = tvGenres[itv].id;
                 genreName = tvGenres[itv].name;
                 mediaType = "tv";
-                title = `${genreName} Tv series`;
+                title = `${genreName} Tv Series`;
                 itv += 1;
                 CollectionState.itv += 1;
             }
             _.View.discover(
-                _.API.getDiscover(mediaType, genre, "1"),
+                _.API.getDiscover(
+                    /*mediaType*/   mediaType,
+                    /*page*/        "1",
+                    /*genre*/       genre,
+                    /*cast*/        undefined,
+                    /*crew*/        undefined,
+                    /*company*/     undefined
+                ),
                 title,
                 mediaType,
+                genre,
                 i,
                 5,
                 DOM

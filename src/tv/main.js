@@ -48,11 +48,19 @@ function collectionsFill(DOM, collections, addSkeleton) {
     while (c < end) {
         genre = genres[index].id;
         genreName = genres[index].name;
-        title = `${genreName} Tv series`;
+        title = `${genreName} Tv Series`;
         _.View.discover(
-            _.API.getDiscover("tv", genre, "1"),
+            _.API.getDiscover(
+                /*mediaType*/   "tv",
+                /*page*/        "1",
+                /*genre*/       genre,
+                /*cast*/        undefined,
+                /*crew*/        undefined,
+                /*company*/     undefined
+            ),
             title,
             "tv",
+            genre,
             c,
             base,
             DOM
@@ -74,13 +82,13 @@ window.addEventListener("DOMContentLoaded", function () {
         templateCollection: document.getElementById("template_collection"),
         templateModal: document.getElementById("template_modal"),
         //header
-        headerButtonNav: document.getElementById("header_button-nav"),
-        headerNav: document.getElementById("header_nav"),
+        headerPNav: document.getElementById("header_p_nav"),
         headerButtonSearch: document.getElementById("header_button-search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
         //main
         main: document.getElementById("main"),
         hero: document.getElementById("hero"),
+        heroTitle: document.getElementById("hero-title"),
         view: document.getElementById("view"),
         buttonMore: document.getElementById("button-more"),
 
@@ -93,14 +101,8 @@ window.addEventListener("DOMContentLoaded", function () {
     if (DOM.templateModal === null) {
         throw Error("DOM.templateModal is null");
     }
-    if (DOM.headerButtonNav === null) {
-        throw Error("DOM.headerButtonNav is null");
-    }
-    if (DOM.headerNav === null) {
-        throw Error("DOM.headerNav is null");
-    }
-    if (DOM.headerButtonSearch === null) {
-        throw Error("DOM.headerButtonSearch is null");
+    if (DOM.headerPNav === null) {
+        throw Error("DOM.headerPNav is null");
     }
     if (DOM.headerButtonTheme === null) {
         throw Error("DOM.headerButtonTheme is null");
@@ -110,6 +112,9 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     if (DOM.hero === null) {
         throw Error("DOM.hero is null");
+    }
+    if (DOM.heroTitle === null) {
+        throw Error("DOM.heroTitle is null");
     }
     if (DOM.view === null) {
         throw Error("DOM.view is null");
@@ -135,14 +140,14 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerButtonTheme.setAttribute("data-type", _.Theme.current);
     DOM.headerButtonTheme.addEventListener("click", _.Theme.onclick);
 
-    DOM.headerButtonNav.addEventListener("click", _.Nav.buttonNavOnclick);
-    DOM.headerNav.addEventListener("focusout", _.Nav.navOnfocusout);
+    DOM.headerPNav.firstElementChild.addEventListener("click", _.Nav.buttonNavOnclick);
+    DOM.headerPNav.lastElementChild.addEventListener("focusout", _.Nav.navOnfocusout);
 
     DOM.view.addEventListener("click", function (e) {
         _.View.onclick(e.target, DOM, e);
     });
 
-    DOM.hero.lastElementChild.addEventListener("click", function (e) {
+    DOM.heroTitle.addEventListener("click", function (e) {
         _.Hero.DOMTitleOnclick(e.target, DOM, e);
     });
 
@@ -191,7 +196,8 @@ window.addEventListener("DOMContentLoaded", function () {
             /*data*/            data.results,
             /*mediaType*/       "tv",
             /*collectionType*/  _.Collection.TRENDING,
-            /*DFCollection*/    DOM.templateCollection.content,
+            /*genre*/           undefined,
+            /*DFCollection*/    DOM.templateCollection.content
         );
         var DOMPos0 = DOM.view.children[0];
         DOMPos0.insertAdjacentElement("beforebegin", DOMColl);
@@ -204,10 +210,11 @@ window.addEventListener("DOMContentLoaded", function () {
             throw Error("API.getDiscover does not have data");
         }
         var DOMColl = _.Collection.createDOMCollection(
-            /*header*/          "Popular Tv series",
+            /*header*/          "Popular TV Series",
             /*data*/            data.results,
             /*mediaType*/       "tv",
             /*collectionType*/  _.Collection.POPULAR,
+            /*genre*/           undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
         var DOMPos1 = DOM.view.children[1];
@@ -221,10 +228,11 @@ window.addEventListener("DOMContentLoaded", function () {
             throw Error("API.getTopRated does not have data");
         }
         var DOMColl = _.Collection.createDOMCollection(
-            /*header*/          "Top rated tv serie",
+            /*header*/          "Top Rated Tv Serie",
             /*data*/            data.results,
             /*mediaType*/       "tv",
             /*collectionType*/  _.Collection.TOP_RATED,
+            /*genre*/           undefined,
             /*DFCollection*/  DOM.templateCollection.content,
         );
         var DOMPos2 = DOM.view.children[2];
