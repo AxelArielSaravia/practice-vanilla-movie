@@ -46,15 +46,15 @@ window.addEventListener("DOMContentLoaded", function () {
     _.Route.url.href = window.location.href;
     var url = _.Route.url;
     var qmediaType = url.searchParams.get(_.Route.Q_MEDIA_TYPE);
-    if (qmediaType === null) {
-        throw Error("Bad Route");
+    if (qmediaType === "tv") {
+        DOM.main.firstElementChild.textContent += " Tv Series";
+    } else if (qmediaType === "movie") {
+        DOM.main.firstElementChild.textContent += " Movies";
     } else {
-        if (qmediaType === "tv") {
-            DOM.main.firstElementChild.textContent += " Tv Series";
-        } else if (qmediaType === "movie") {
-            DOM.main.firstElementChild.textContent += " Movies";
-        }
+        throw Error("Bad Route");
     }
+
+    _.API.getTopRated(qmediaType, "1").then(console.info);
 
     //Theme
     _.Theme.init();

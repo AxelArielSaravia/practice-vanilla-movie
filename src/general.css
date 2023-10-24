@@ -382,12 +382,17 @@ body {
 }
 
 /*Main*/
-.collections-main {
+.main-content {
     flex-grow: 1;
-    position: relative;
     min-height: 1000px;
     margin-top: var(--main-margin-top);
     width: 100%;
+}
+.main-content:not([data-fixed]) {
+    position: relative;
+}
+.main-content[data-fixed] {
+    position: fixed;
 }
 
 /*More*/

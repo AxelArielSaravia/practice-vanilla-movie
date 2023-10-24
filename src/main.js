@@ -1,4 +1,5 @@
-import _ from "./general.js";
+import G from "./general.js";
+import C from "./collection.js";
 
 const CollectionState = {
     MAX: 15,
@@ -68,8 +69,8 @@ function collectionsFill(DOM) {
             CollectionState.itv += 1;
         }
         CollectionState.count += 1;
-        _.View.discover(
-            _.API.getDiscover(
+        C.View.discover(
+            G.API.getDiscover(
                 /*mediaType*/   mediaType,
                 /*page*/        "1",
                 /*genre*/       genre,
@@ -144,36 +145,36 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     //Theme
-    _.Theme.init();
+    G.Theme.init();
 
     //Route
-    _.Route.init(DOM);
+    G.Route.init(DOM);
 
     //Events
     window.addEventListener("popstate", function () {
-        _.Route.onpopstate(DOM);
+        G.Route.onpopstate(DOM);
     });
 
-    DOM.headerButtonTheme.setAttribute("data-type", _.Theme.current);
-    DOM.headerButtonTheme.addEventListener("click", _.Theme.onclick);
+    DOM.headerButtonTheme.setAttribute("data-type", G.Theme.current);
+    DOM.headerButtonTheme.addEventListener("click", G.Theme.onclick);
 
-    DOM.headerPNav.firstElementChild.addEventListener("click", _.Nav.buttonNavOnclick);
-    DOM.headerPNav.lastElementChild.addEventListener("focusout", _.Nav.navOnfocusout);
+    DOM.headerPNav.firstElementChild.addEventListener("click", G.Nav.buttonNavOnclick);
+    DOM.headerPNav.lastElementChild.addEventListener("focusout", G.Nav.navOnfocusout);
 
     DOM.view.addEventListener("click", function (e) {
-        _.View.onclick(e.target, DOM, e);
+        C.View.onclick(e.target, DOM, e);
     });
 
     DOM.heroTitle.addEventListener("click", function (e) {
-        _.Hero.DOMTitleOnclick(e.target, DOM, e);
+        G.Hero.DOMTitleOnclick(e.target, DOM, e);
     });
 
     DOM.modal.addEventListener("click", function (e) {
-        _.Modal.onclick(e.target, DOM);
+        G.Modal.onclick(e.target, DOM);
     });
 
     DOM.modal.addEventListener("change", function (e) {
-        _.Modal.onchange(e.target, DOM);
+        G.Modal.onchange(e.target, DOM);
     });
 
     DOM.buttonMore.addEventListener("click", function (e) {
@@ -181,23 +182,23 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     //Data
-    var trendingPromise = _.API.getTrending("all", "1");
+    var trendingPromise = G.API.getTrending("all", "1");
     trendingPromise.then(function (data) {
         console.info("trending: ", data);
     });
 
-    var heroPromise = trendingPromise.then(_.Hero.selectHero);
+    var heroPromise = trendingPromise.then(G.Hero.selectHero);
     heroPromise.then(function (data) {
         console.info("hero: ", data);
     });
 
-    heroPromise.then(_.Hero.getHeroLogo).then(function (data) {
-        _.Hero.initDOMImgLogo(data, DOM.hero);
+    heroPromise.then(G.Hero.getHeroLogo).then(function (data) {
+        G.Hero.initDOMImgLogo(data, DOM.hero);
     });
 
     heroPromise.then(function (data) {
         if (data !== undefined) {
-           _.Hero.initDOM(data, DOM.hero);
+           G.Hero.initDOM(data, DOM.hero);
         }
     });
 
@@ -205,11 +206,11 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTrending does not have data");
         }
-        var DOMColl = _.Collection.createDOMCollection(
+        var DOMColl = C.Collection.createDOMCollection(
             /*header*/          "Week Trendings",
             /*data*/            data.results,
             /*mediaType*/       "all",
-            /*collectionType*/  _.Collection.TRENDING,
+            /*collectionType*/  C.Collection.TRENDING,
             /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
@@ -218,16 +219,16 @@ window.addEventListener("DOMContentLoaded", function () {
         DOMPos0.remove();
     });
 
-    _.API.getPopular("movie", "1").then(function (data) {
+    G.API.getPopular("movie", "1").then(function (data) {
         console.info("getPopular movie", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        var DOMColl = _.Collection.createDOMCollection(
+        var DOMColl = C.Collection.createDOMCollection(
             /*header*/          "Popular Movies",
             /*data*/            data.results,
             /*mediaType*/       "movie",
-            /*collectionType*/  _.Collection.POPULAR,
+            /*collectionType*/  C.Collection.POPULAR,
             /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
@@ -236,16 +237,16 @@ window.addEventListener("DOMContentLoaded", function () {
         DOMPos1.remove();
     });
 
-    _.API.getPopular("tv", "1").then(function (data) {
+    G.API.getPopular("tv", "1").then(function (data) {
         console.info("getPopular tv", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
-        var DOMColl = _.Collection.createDOMCollection(
+        var DOMColl = C.Collection.createDOMCollection(
             /*header*/          "Popular Tv Series",
             /*data*/            data.results,
             /*mediaType*/       "tv",
-            /*collectionType*/  _.Collection.POPULAR,
+            /*collectionType*/  C.Collection.POPULAR,
             /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
@@ -254,16 +255,16 @@ window.addEventListener("DOMContentLoaded", function () {
         DOMPos2.remove();
     });
 
-    _.API.getTopRated("movie", "1").then(function (data) {
+    G.API.getTopRated("movie", "1").then(function (data) {
         console.info("getTopRate movie", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = _.Collection.createDOMCollection(
+        var DOMColl = C.Collection.createDOMCollection(
             /*header*/          "Top Rated Movie",
             /*data*/            data.results,
             /*mediaType*/       "movie",
-            /*collectionType*/  _.Collection.TOP_RATED,
+            /*collectionType*/  C.Collection.TOP_RATED,
             /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
@@ -272,16 +273,16 @@ window.addEventListener("DOMContentLoaded", function () {
         DOMPos3.remove();
     });
 
-    _.API.getTopRated("tv", "1").then(function (data) {
+    G.API.getTopRated("tv", "1").then(function (data) {
         console.info("getTopRate tv", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
-        var DOMColl = _.Collection.createDOMCollection(
+        var DOMColl = C.Collection.createDOMCollection(
             /*header*/          "Top Rated Tv Serie",
             /*data*/            data.results,
             /*mediaType*/       "tv",
-            /*collectionType*/  _.Collection.TOP_RATED,
+            /*collectionType*/  C.Collection.TOP_RATED,
             /*genreId*/         undefined,
             /*DFCollection*/    DOM.templateCollection.content,
         );
@@ -290,8 +291,8 @@ window.addEventListener("DOMContentLoaded", function () {
         DOMPos4.remove();
     });
 
-    var movieGenreList = _.API.getGenres("movie");
-    var tvGenreList = _.API.getGenres("tv");
+    var movieGenreList = G.API.getGenres("movie");
+    var tvGenreList = G.API.getGenres("tv");
     Promise.all([movieGenreList,tvGenreList]).then(function (data) {
         console.info("movie genres", data[0]);
         console.info("tv genres", data[1]);
@@ -322,10 +323,10 @@ window.addEventListener("DOMContentLoaded", function () {
         DOM.buttonMore?.setAttribute("data-display", "1");
 
         if (movieGenres.length > 1) {
-            _.Utils.randomPermutation(movieGenres);
+            G.Utils.randomPermutation(movieGenres);
         }
         if (tvGenres.length > 1) {
-            _.Utils.randomPermutation(tvGenres)
+            G.Utils.randomPermutation(tvGenres)
         }
 
         /** @type {"movie" | "tv"}*/
@@ -354,8 +355,8 @@ window.addEventListener("DOMContentLoaded", function () {
                 itv += 1;
                 CollectionState.itv += 1;
             }
-            _.View.discover(
-                _.API.getDiscover(
+            C.View.discover(
+                G.API.getDiscover(
                     /*mediaType*/   mediaType,
                     /*page*/        "1",
                     /*genre*/       genre,

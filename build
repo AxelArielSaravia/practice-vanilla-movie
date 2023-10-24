@@ -9,16 +9,14 @@ dir=./public
 media=0
 api=0
 
-if [ "$1" = "media" ]; then
-    media=1
-elif [ "$1" = "api" ]; then
-    api=1
-fi
-if [ "$2" = "media" ]; then
-    media=1
-elif [ "$2" = "api" ]; then
-    api=1
-fi
+case "$1" in
+    "media") media=1;;
+    "api") api=1;;
+esac
+case "$2" in
+    "media") media=1;;
+    "api") api=1;;
+esac
 
 if [ ! -d $dir ]; then
     mkdir $dir
@@ -74,8 +72,8 @@ echo modal.css minified success
 minify -o $dir/modal-tv.css ./src/modal-tv.css
 echo modal-tv.css minified success
 
-minify -o $dir/discover.css ./src/discover.css
-echo discover.css minified success
+minify -o $dir/others.css ./src/others.css
+echo others.css minified success
 
 
 #Tv

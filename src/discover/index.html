@@ -25,10 +25,9 @@
     <link rel="icon" href="/media/icon-180.png">
     <link rel="apple-touch-icon" href="/media/icon-180.png">
     <link rel="stylesheet" href="general.css">
-    <link rel="stylesheet" href="hero.css">
     <link rel="stylesheet" href="modal.css">
     <link rel="stylesheet" href="modal-tv.css">
-    <link rel="stylesheet" href="discover.css">
+    <link rel="stylesheet" href="others.css">
     <script src="general.js" type="module"></script>
     <script src="/discover/main.js" type="module"></script>
 </head>
@@ -53,7 +52,7 @@
         </a>
         <nav id="header_p_nav" class="primary-nav">
             <button class="nav-button" type="button">
-                Discover
+                Top Rated
             </button>
             <ul class="nav" data-mbshow="0">
                 <li class="nav-tab">
@@ -149,37 +148,40 @@
             </button>
         </div>
     </header>
-    <main id="main">
-        <h2 class="title">Discover:</h2>
-        <div class="view">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
+    <div id="main" class="main-content">
+        <h2 class="title">Discover</h2>
+        <div class="no-content" data-display="0">
+            <p>No content</p>
         </div>
-    </main>
-    <button
-        id="button-more"
-        class="more"
-        type="button"
-        data-display="0"
-    >
-        More
-    </button>
-    <footer>
-        <p class="social">
-        <span>
-            create by
-            <a
-               href="https://github.com/AxelArielSaravia/"
-               target="_blank"
-               rel="noreferrer noopener"
-            >Axel Ariel Saravia</a>
-        </span>
-        </p>
-    </footer>
+        <main id="view" class="view">
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+        </main>
+        <button
+            id="button-more"
+            class="more"
+            type="button"
+            data-display="0"
+        >
+            More
+        </button>
+        <footer>
+            <p class="social">
+            <span>
+                create by
+                <a
+                    href="https://github.com/AxelArielSaravia/"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                >Axel Ariel Saravia</a>
+            </span>
+            </p>
+        </footer>
+    </div>
     <div
         id="modal"
         class="modal"
@@ -234,7 +236,6 @@
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
-                    stroke-linecap="round"
                     stroke-linejoin="round"
                 >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -263,16 +264,16 @@
             </div>
         </article>
     </div>
-    <template id="template_skeleton">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-    </template>
+    <template id="template_skeleton"></template>
     <template id="template_item">
-        <button class="item" data-id="" data-type="6" data-media="">
+        <a
+            class="item"
+            data-type="6"
+            rel="noreferer noopener"
+            data-id=""
+            data-media=""
+            href=""
+        >
             <img alt="" src="" data-display="0" loading="lazy">
             <svg
                 class="icon icon-video"
@@ -288,7 +289,7 @@
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
             </svg>
             <h3 data-opacity="1"></h3>
-        </button>
+        </a>
     </template>
     <template id="template_modal">
     <!--0 Item-->

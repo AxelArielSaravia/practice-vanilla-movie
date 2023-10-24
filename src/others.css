@@ -1,23 +1,26 @@
-body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
 
-main {
-    flex-grow: 1;
+.main-content {
     padding: 10px;
+    min-height: 0%;
 }
 
-main>.title {
+.main-content>.title {
     font-size: 2.5rem;
     margin-bottom: 40px;
+    margin-top: var(--header-min-height);
+}
+
+.no-content[data-display="1"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
 }
 
 .view {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    margin-bottom: 40px;
 }
 
 .view :is(.item, .skeleton){
@@ -85,42 +88,48 @@ main>.title {
 
 @media (min-width: 1800px) {
     .view {
-        --item-width: 16.7%;
-        --item-height: 8.5vw;
+        --item-width: 16.24%;
+        --item-height: 9vw;
+        gap: 0.5vw;
     }
 }
 
 @media (min-width: 1200px) and (max-width: 1799px) {
     .view {
-        --item-width: 20%;
-        --item-height: 10.2vw;
+        --item-width: 19.17%;
+        --item-height: 10.5vw;
+        gap: 1vw;
     }
 }
 
 @media (min-width: 880px) and (max-width: 1199px) {
     .view {
-        --item-width: 25%;
-        --item-height: 12.7vw;
+        --item-width: 24.2%;
+        --item-height: 13vw;
+        gap: 1vw;
     }
 }
 
 @media (min-width: 640px) and (max-width: 879px) {
     .view {
-        --item-width: 33%;
-        --item-height: 16.7vw;
+        --item-width: 32.6%;
+        --item-height: 17.5vw;
+        gap: 1vw;
     }
 }
 
 @media (max-width: 639px) and (min-width: 380px) {
     .view {
-        --item-width: 48%;
-        --item-height: 24vw;
+        --item-width: 49.1%;
+        --item-height: 25.5vw;
+        gap: 1.5vw;
     }
 }
 
 @media (max-width: 379px) {
     .view {
-        --item-width: 80%;
-        --item-height: 39.3vw;
+        --item-width: 100%;
+        --item-height: 100%;
+        gap: 10px;
     }
 }

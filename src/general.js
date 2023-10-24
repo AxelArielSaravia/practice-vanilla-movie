@@ -3,14 +3,8 @@ const TYPE = {
     @type {"0"}*/
     NAV_LINK: "0",
     /**
-    @type {"4"}*/
-    COLL_TITLE: "4",
-    /**
-    @type {"5"}*/
-    COLL_BUTTON: "5",
-    /**
     @type {"6"} */
-    COLL_ITEM: "6",
+    ITEM: "6",
     /**
     @type {"8"} */
     MODAL: "8",
@@ -372,11 +366,13 @@ const Route = {
 
     url: new URL(window.location.href),
     origin: `${window.location.origin}${window.location.pathname}`,
+    href: `${window.location.origin}${window.location.pathname}`,
+    hrefq: `${window.location.origin}${window.location.pathname}?`,
 
     /**
     @type {(type: "movie" | "tv", id: string) => string} */
     getHref(type, id) {
-        return `${Route.origin}?${Route.Q_MEDIA_TYPE}=${type}&${Route.Q_ID}=${id}`;
+        return `${Route.hrefq}${Route.Q_MEDIA_TYPE}=${type}&${Route.Q_ID}=${id}`;
     },
     /**
     @type {(route: string) => undefined} */
@@ -400,8 +396,8 @@ const Route = {
     @type {(DOM: DOM_T) => undefined} */
     onpopstate(DOM) {
         Route.url.href = window.location.href;
-        var qtype = Route.url.searchParams.get("t");
-        var qid = Route.url.searchParams.get("i");
+        var qtype = Route.url.searchParams.get(Route.Q_MEDIA_TYPE);
+        var qid = Route.url.searchParams.get(Route.Q_ID);
         if (qtype !== null || qid !== null) {
             Modal.close(DOM);
             if (qtype === "tv" || qtype === "movie") {
@@ -415,142 +411,50 @@ const Route = {
     }
 };
 
-
-const Collection = {
-    TYPE_SBUTTON: "data-sbuttont",
-    TRENDING:   "0",
-    POPULAR:    "1",
-    TOP_RATED:  "2",
-    DISCOVER:   "3",
-    /**
-    @type {(target: HTMLElement) => undefined} */
-    DOMCollButtonOnclick(target) {
-        /**@type {HTMLElement}*/
-        var DOMSlider = target.parentElement.lastElementChild;
-        /**@type {HTMLButtonElement}*/
-        const DOMButtonL = target.parentElement.children[1];
-        /**@type {HTMLButtonElement}*/
-        const DOMButtonR = target.parentElement.children[2];
-        var type = target.getAttribute(Collection.TYPE_SBUTTON);
-        var scrollval = (
-            DOMSlider.clientWidth - ((DOMSlider.clientWidth * 6) / 100)
-        );
-
-        if (DOMSlider.scrollLeft - scrollval <= 0) {
-            DOMButtonL.setAttribute("data-display", "0");
-        } else {
-            DOMButtonL.setAttribute("data-display", "1");
-        }
-        if (type === "0") {
-            DOMSlider.scrollBy(-scrollval, 0);
-            if (DOMSlider.scrollLeft - scrollval <= 0) {
-                DOMButtonL.setAttribute("data-display", "0");
-            }
-            DOMButtonR.setAttribute("data-display", "1");
-        } else {
-            DOMSlider.scrollBy(scrollval, 0);
-            if (
-                DOMSlider.scrollLeft + scrollval
-                >= DOMSlider.scrollWidth - DOMSlider.clientWidth
-            ) {
-                DOMButtonR.setAttribute("data-display", "0");
-            }
-            DOMButtonL.setAttribute("data-display", "1");
-        }
-    },
+const Item = {
     /**
     @type {(
-        header: string,
-        data: object,
+        dataItem: object,
         mediaType: "movie" | "tv" | "all",
-        collectionType: "0" | "1" | "2" | "3",
-        genreId: undefined | string,
-        DFCollection: DocumentFragment,
+        DOMTItem: HTMLElement,
     ) => HTMLElement}*/
-    createDOMCollection(
-        header,
-        data,
-        mediaType,
-        collectionType,
-        genreId,
-        DFCollection
-    ) {
-        /**@type {HTMLElement}*/
-        var DOMCollection = DFCollection.children[1].cloneNode(true);
-        var DOMTItem = DFCollection.children[2];
-
-        var DOMTitle = DOMCollection.children[0]
-        DOMTitle.insertAdjacentText("beforeend", header);
-
-        if (collectionType === Collection.TRENDING) {
-            DOMTitle.setAttribute(
-                "href",
-                `${window.location.origin}/trending?${Route.Q_MEDIA_TYPE}=${mediaType}`
-            );
-        } else if (collectionType === Collection.POPULAR) {
-            DOMTitle.setAttribute(
-                "href",
-                `${window.location.origin}/popular?${Route.Q_MEDIA_TYPE}=${mediaType}`
-            );
-        } else if (collectionType === Collection.TOP_RATED) {
-            DOMTitle.setAttribute(
-                "href",
-                `${window.location.origin}/top_rated?${Route.Q_MEDIA_TYPE}=${mediaType}`
-            );
-        } else if (collectionType === Collection.DISCOVER) {
-            if (genreId !== undefined) {
-                DOMTitle.setAttribute(
-                    "href",
-                    `${window.location.origin}/discover?${Route.Q_MEDIA_TYPE}=${mediaType}&${Route.Q_GENRE}=${genreId}&${Route.Q_TITLE}=${encodeURIComponent(header)}`
-                );
-            }
+    createDOMItem(dataItem, mediaType, DOMTItem) {
+        if (mediaType === "all") {
+            mediaType = dataItem.media_type;
         }
-        for (var dataItem of data) {
-            /**@type {HTMLButtonElement}*/
-            const DOMItem = DOMTItem.cloneNode(true)
-            DOMItem.setAttribute("data-id", dataItem.id);
-            let itemTitle;
-            /**@type {"movie"| "tv"} */
-            let itemMediaType;
-            if (mediaType !== "all") {
-                itemMediaType = mediaType;
-            } else {
-                itemMediaType = dataItem.media_type;
-            }
-            if (itemMediaType === "movie") {
-                itemTitle = dataItem.title;
-            } else {
-                itemTitle = dataItem.name;
-            }
-            DOMItem.setAttribute("title", itemTitle);
-            DOMItem.setAttribute(
-                "href",
-                Route.getHref(itemMediaType, dataItem.id)
-            );
-            DOMItem.setAttribute("data-media", itemMediaType);
-            DOMItem.lastElementChild.insertAdjacentText("beforeend", itemTitle);
-
-            DOMItem.firstElementChild.setAttribute("alt", itemTitle);
-            View.setItemImage(
-                API.getImages(dataItem.id, itemMediaType),
-                DOMItem,
-                dataItem.backdrop_path
-            );
-            DOMCollection.lastElementChild.appendChild(DOMItem);
+        /**
+        @type {HTMLButtonElement}*/
+        var DOMItem = DOMTItem.cloneNode(true)
+        var title;
+        if (mediaType === "movie") {
+            title = dataItem.title;
+        } else {
+            title = dataItem.name;
         }
-        return DOMCollection;
+        DOMItem.setAttribute("data-id", dataItem.id);
+        DOMItem.setAttribute("title", title);
+        DOMItem.setAttribute(
+            "href",
+            Route.getHref(mediaType, dataItem.id)
+        );
+        DOMItem.setAttribute("data-media", mediaType);
+        DOMItem.lastElementChild.insertAdjacentText("beforeend", title);
+
+        DOMItem.firstElementChild.setAttribute("alt", title);
+        Item.setImage(
+            API.getImages(dataItem.id, mediaType),
+            DOMItem,
+            dataItem.backdrop_path
+        );
+        return DOMItem;
     },
-};
-
-const View = {
-    topScroll: 0,
     /**
     @type {(
         data: Promise<maybe<object>>,
         DOMItem: HTMLButtonElement,
         backdropAlt: null | string,
     ) => Promise<undefined>}*/
-    async setItemImage(dataP, DOMItem, backdropAlt) {
+    async setImage(dataP, DOMItem, backdropAlt) {
         var data = await dataP;
         var DOMImg = DOMItem.firstElementChild;
         if (data === undefined
@@ -576,56 +480,6 @@ const View = {
             DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
         }
     },
-    /**
-    @type {(
-        DataPromise: Promise<object>,
-        title: string,
-        mediaType: "movie" | "tv",
-        genre: undefined | string,
-        i: number,       //relavie index of the DOM children
-        base: number,   //absolute index of the first DOM children
-        DOM: DOM_T
-    ) => Promise<undefined>} */
-    async discover(DataPromise, title, mediaType, genre, i, base, DOM) {
-        var data = await DataPromise;
-        console.info(title, data);
-        if (data?.results === undefined || data.results.length === 0) {
-            throw Error("API.getTopRated does not have data");
-        }
-        var DOMColl = Collection.createDOMCollection(
-            /*header*/          title,
-            /*data*/            data.results,
-            /*mediaType*/       mediaType,
-            /*collectionType*/  Collection.DISCOVER,
-            /*genreId*/         genre,
-            /*DFCollection*/    DOM.templateCollection.content,
-        );
-        var DOMPos = DOM.view.children[base + i];
-        DOMPos.insertAdjacentElement("beforebegin", DOMColl);
-        DOMPos.remove();
-    },
-    /**
-    @type {(target: HTMLElement, DOM: DOM_T, e: Event) => undefined} */
-    onclick(target, DOM, e) {
-        var type = target.getAttribute("data-type");
-        if (type === TYPE.COLL_BUTTON) {
-            Collection.DOMCollButtonOnclick(target);
-        } else if (type === TYPE.COLL_ITEM) {
-            e.preventDefault();
-            var mediaType = target.getAttribute("data-media");
-            var id = target.getAttribute("data-id");
-            if (mediaType !== null && id !== null) {
-                Modal.open(
-                    /*mediaType*/   mediaType,
-                    /*id*/          id,
-                    /*DOM*/         DOM,
-                    /*changeRoute*/ true
-                );
-            } else {
-                console.error("View onclick bad mediaType or id");
-            }
-        }
-    }
 };
 
 var ABORT = new AbortController();
@@ -642,6 +496,7 @@ function abortFetch(msg) {
 
 const Modal = {
     fragment: document.createDocumentFragment(),
+    topScroll: 0,
     id: "",
     isOpen: false,
     /**
@@ -847,7 +702,7 @@ const Modal = {
             for (var episode of episodes) {
                 var DOMEpisode = DOMTEpisode.cloneNode(true);
                 var DOMEImg = DOMEpisode.children[0].firstElementChild;
-                var DOMENum = DOMEpisode.children[1]
+                var DOMENum = DOMEpisode.children[1];
                 var DOMEDate = DOMEpisode.children[2].children[0];
                 var DOMEName = DOMEpisode.children[2].children[1];
                 var DOMETime = DOMEpisode.children[2].children[2];
@@ -1312,12 +1167,12 @@ const Modal = {
         DOMImg?.setAttribute("alt", "");
 
         var l = DOMContent.children.length;
-        DOMContent.children[0].replaceChildren();   //DOMTitle
-        DOMContent.children[1].replaceChildren();   //DOMGenters
-        DOMContent.children[2].replaceChildren();   //DOMDuration
-        DOMContent.children[3].replaceChildren();   //DOMDescription
-        DOMContent.children[4].replaceChildren();   //DOMPrimaryData
-        DOMContent.children[5].replaceChildren();   //DOMCast
+        DOMContent.children[0].replaceChildren();       //DOMTitle
+        DOMContent.children[1].replaceChildren();       //DOMGenters
+        DOMContent.children[2].replaceChildren();       //DOMDuration
+        DOMContent.children[3].replaceChildren();       //DOMDescription
+        DOMContent.children[4].replaceChildren();       //DOMPrimaryData
+        DOMContent.children[5].replaceChildren();       //DOMCast
         DOMContent.lastElementChild.replaceChildren();  //DOMCredits
 
         if (Modal.mediaType === "tv") {
@@ -1331,10 +1186,10 @@ const Modal = {
         DOMSimilars.lastElementChild.replaceChildren();
 
         DOM.main.style.removeProperty("transform");
-        DOM.main.style.setProperty("position", "relative");
+        DOM.main.toggleAttribute("data-fixed");
 
         DOM.modal.setAttribute("data-display", "0");
-        document.firstElementChild.scrollTop = View.topScroll;
+        document.firstElementChild.scrollTop = Modal.topScroll;
 
         Modal.isOpen = false;
         Modal.seasonNumber = -1;
@@ -1352,7 +1207,7 @@ const Modal = {
         changeRoute: boolean,
     ) => undefined}*/
     open(mediaType, id, DOM, changeRoute) {
-        View.topScroll = document.firstElementChild.scrollTop;
+        Modal.topScroll = document.firstElementChild.scrollTop;
         document.firstElementChild.scrollTop = 0;
 
         Modal.isOpen = true;
@@ -1364,9 +1219,9 @@ const Modal = {
 
         DOM.main.style.setProperty(
             "transform",
-            `translateY(-${View.topScroll}px)`
+            `translateY(-${Modal.topScroll}px)`
         );
-        DOM.main.style.setProperty("position", "fixed");
+        DOM.main.toggleAttribute("data-fixed");
         Modal.getData(mediaType, id, DOM, changeRoute);
     },
     /**
@@ -1395,10 +1250,10 @@ const Modal = {
         var type = target.getAttribute("data-type");
         if (type === TYPE.MODAL || type === TYPE.MODAL_CLOSE) {
             Modal.close(DOM);
-            Route.pushstate(Route.origin);
+            Route.pushstate(Route.href);
         } else if (type === TYPE.MODAL_C_MORE) {
             target.parentElement.setAttribute("data-more", "1")
-        } else if (type === TYPE.COLL_ITEM) {
+        } else if (type === TYPE.ITEM) {
             var id = target?.getAttribute("data-id");
             var mediaType = target?.getAttribute("data-media");
             Modal.close(DOM);
@@ -1414,8 +1269,7 @@ export default {
     Hero,
     Nav,
     Route,
-    View,
+    Item,
     Modal,
-    Collection,
     Utils,
 };
