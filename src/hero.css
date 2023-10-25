@@ -132,6 +132,7 @@
     }
     .hero .info .logo img {
         max-width: 170px;
+        max-height: 140px;
     }
 }
 
@@ -141,6 +142,7 @@
     }
     .hero .info img {
         width: 30vw;
+        max-height: 20vw;
     }
 }
 
@@ -150,5 +152,6 @@
     }
     .hero .info img {
         width: 25vw;
+        max-height: 25vw;
     }
 }
