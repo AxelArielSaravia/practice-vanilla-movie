@@ -48,14 +48,19 @@ if [ ! -d "$dir/trending" ]; then
 fi
 
 #Home
+minify -o $dir/index.html ./src/index.html --html-keep-end-tags
+echo index.html minified success
+
+
 bun build ./src/main.js --outdir $dir --minify --external '*'
 echo JS Build main.js Successful
 
 bun build ./src/general.js --outdir $dir --minify --external '*'
 echo JS Build general.js Successful
 
-minify -o $dir/index.html ./src/index.html --html-keep-end-tags
-echo index.html minified success
+bun build ./src/collection.js --outdir $dir --minify --external '*'
+echo JS Build collection.js Successful
+
 
 minify -o $dir/general.css ./src/general.css
 echo general.css minified success
@@ -71,6 +76,9 @@ echo modal.css minified success
 
 minify -o $dir/modal-tv.css ./src/modal-tv.css
 echo modal-tv.css minified success
+
+minify -o $dir/collection.css ./src/collection.css
+echo collection.css minified success
 
 minify -o $dir/others.css ./src/others.css
 echo others.css minified success
