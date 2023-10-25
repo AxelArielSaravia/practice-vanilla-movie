@@ -10,15 +10,24 @@ export default async function handler(req) {
     var qtype = url.searchParams.get("t");
     var qpage = url.searchParams.get("p");
     var qgenre = url.searchParams.get("g");
+    var qcast = url.searchParams.get("ca");
+    var qcrew = url.searchParams.get("cr");
+    var qcompany = url.searchParams.get("co");
     if (qtype !== "movie" && qtype !== "tv") {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }
     var p = `${process.env.API_URL}/discover/${qtype}${SEARCH}`;
-    if (qpage !== undefined) {
+    if (qpage !== null) {
         p = `${p}&page=${qpage}`;
     }
-    if (qgenre !== undefined) {
+    if (qgenre !== null) {
         p = `${p}&with_genres=${qgenre}`;
+    } else if (qcast !== null) {
+        p = `${p}&with_cast=${qcast}`;
+    } else if (qcrew !== null) {
+        p = `${p}&with_crew=${qcrew}`;
+    } else if (qcompany !== null) {
+        p = `${p}&with_companies=${qcompany}`;
     }
     const r = await fetch(p, _utils.FETCH_OPT);
     if (!r.ok) {

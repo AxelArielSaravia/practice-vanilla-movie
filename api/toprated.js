@@ -12,7 +12,7 @@ export default async function handler(req) {
         return new Response("Bad request", _utils.RES_BAD_OPT);
     }
     var p = `${process.env.API_URL}/${qtype}/top_rated`;
-    if (qpage !== undefined) {
+    if (qpage !== null) {
         p = `${p}?page=${qpage}`;
     }
     const r = await fetch(p, _utils.FETCH_OPT);

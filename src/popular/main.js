@@ -9,12 +9,25 @@ const State = {
 const DOMSkeletons = Array(6);
 
 async function addItems(dataPromise, qmediaType, DOM) {
-    var data = await dataPromise;
-    if (data?.results === undefined || data.results.length === 0) {
+    var data;
+    try {
+        data = await dataPromise;
+    } catch {
         State.ended = true;
+        DocumentFragment.prototype.replaceChildren.apply(
+            DOM.templateSkeleton.content,
+            DOMSkeletons
+        );
         return;
     }
-    console.info(data);
+    if (data?.results === undefined || data.results.length === 0) {
+        State.ended = true;
+        DocumentFragment.prototype.replaceChildren.apply(
+            DOM.templateSkeleton.content,
+            DOMSkeletons
+        );
+        return;
+    }
     var DOMItem;
     for (var dataItem of data.results) {
         DOMItem = G.Item.createDOMItem(
@@ -115,7 +128,7 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerPNav.firstElementChild.addEventListener("click", G.Nav.buttonNavOnclick);
     DOM.headerPNav.lastElementChild.addEventListener("focusout", G.Nav.navOnfocusout);
 
-    DOM.buttonMore.addEventListener("click", function (e) {
+    DOM.buttonMore.addEventListener("click", function () {
         DOM.buttonMore?.setAttribute("data-display", "0");
         if (State.ended) {
             return;
@@ -180,6 +193,7 @@ window.addEventListener("DOMContentLoaded", function () {
             DOMSkeletons
         );
         DOM.view.appendChild(State.fragment);
+        popularPromise = null;
     });
     popularPromise2.then(function (data) {
         if (data?.results === undefined || data.results.length === 0) {
@@ -197,5 +211,6 @@ window.addEventListener("DOMContentLoaded", function () {
         }
         DOM.view.appendChild(State.fragment);
         DOM.buttonMore?.setAttribute("data-display", "1");
+        popularPromise2 = null;
     });
 });

@@ -161,14 +161,11 @@ const API = {
         var p = `${window.location.origin}/api/discover?t=${type}&p=${page}`;
         if (genre !== undefined) {
             p = `${p}&g=${genre}`;
-        }
-        if (cast !== undefined) {
+        } else if (cast !== undefined) {
             p = `${p}&ca=${cast}`;
-        }
-        if (crew !== undefined) {
+        } else if (crew !== undefined) {
             p = `${p}&cr=${crew}`;
-        }
-        if (company !== undefined) {
+        } else if (company !== undefined) {
             p = `${p}&co=${company}`;
         }
         return fetch(p).then(fetchResolve);
@@ -398,15 +395,14 @@ const Route = {
         Route.url.href = window.location.href;
         var qtype = Route.url.searchParams.get(Route.Q_MEDIA_TYPE);
         var qid = Route.url.searchParams.get(Route.Q_ID);
-        if (qtype !== null || qid !== null) {
+        if (Modal.isOpen) {
             Modal.close(DOM);
-            if (qtype === "tv" || qtype === "movie") {
-                Modal.open(qtype, qid, DOM, false);
-            }
-        } else {
-            if (Modal.isOpen) {
-                Modal.close(DOM);
-            }
+        }
+        if (
+            qid !== null
+            && (qtype === "tv" || qtype === "movie")
+        ) {
+            Modal.open(qtype, qid, DOM, false);
         }
     }
 };
