@@ -51,6 +51,9 @@ fi
 minify -o $dir/index.html ./src/index.html --html-keep-end-tags
 echo index.html minified success
 
+minify -o $dir/404.html ./src/404.html --html-keep-end-tags
+echo 404.html minified success
+
 
 bun build ./src/main.js --outdir $dir --minify --external '*'
 echo JS Build main.js Successful

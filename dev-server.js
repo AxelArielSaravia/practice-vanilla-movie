@@ -33,6 +33,11 @@ const ResponseBad = new Response("File not found", RES_OPTS);
 
 const Url = new URL("a:0.a");
 
+function response404() {
+    var basePath = path.join(DIR, "/404.html");
+    return new Response(Bun.file(basePath));
+}
+
 function staticResponse(req, reqPath) {
     if (reqPath === "/") {
         reqPath = "/index.html";
@@ -58,8 +63,7 @@ function staticResponse(req, reqPath) {
 
     let extension = path.extname(reqPath);
     if (extension.length === 0) {
-        console.warn("The request path is bad:", reqPath);
-        return ResponseBad;
+        return response404();
     }
 
     let basePath = "";
@@ -77,9 +81,8 @@ function staticResponse(req, reqPath) {
         console.info("Request path exist. Sending:", reqPath);
         return new Response(Bun.file(basePath));
     } else {
-        console.warn(`WARNING: No such file or directory: ${basePath}`);
+        return response404();
     }
-    return ResponseBad;
 }
 
 Bun.serve({
