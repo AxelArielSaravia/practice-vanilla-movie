@@ -144,9 +144,10 @@ window.addEventListener("DOMContentLoaded", function () {
         if (type === G.TYPE.ITEM) {
             e.preventDefault();
             var id = target.getAttribute("data-id");
-            if (id !== null) {
+            var mediaType = target.getAttribute("data-media");
+            if (id !== null && mediaType !== null) {
                 G.Modal.open(
-                    /*mediaType*/   qmediaType,
+                    /*mediaType*/   mediaType,
                     /*id*/          id,
                     /*DOM*/         DOM,
                     /*changeRoute*/ true
