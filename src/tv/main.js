@@ -84,7 +84,6 @@ window.addEventListener("DOMContentLoaded", function () {
         templateModal: document.getElementById("template_modal"),
         //header
         headerPNav: document.getElementById("header_p_nav"),
-        headerButtonSearch: document.getElementById("header_button-search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
         //main
         main: document.getElementById("main"),

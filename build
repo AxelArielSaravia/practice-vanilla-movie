@@ -148,15 +148,17 @@ if [ $api = 1 ]; then
         mkdir $api_dir
         echo Create $api_dir
     fi
+    minify -o $api_dir/_utils.js    ./api/_utils.js
     minify -o $api_dir/credits.js  ./api/credits.js
     minify -o $api_dir/discover.js  ./api/discover.js
     minify -o $api_dir/genres.js    ./api/genres.js
     minify -o $api_dir/images.js    ./api/images.js
     minify -o $api_dir/movie.js     ./api/movie.js
     minify -o $api_dir/popular.js   ./api/popular.js
+    minify -o $api_dir/search.js    ./api/search.js
+    minify -o $api_dir/season.js    ./api/season.js
     minify -o $api_dir/toprated.js  ./api/toprated.js
     minify -o $api_dir/trending.js  ./api/trending.js
     minify -o $api_dir/tv.js        ./api/tv.js
-    minify -o $api_dir/_utils.js    ./api/_utils.js
     echo API minified success
 fi

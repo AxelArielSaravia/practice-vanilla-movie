@@ -356,19 +356,61 @@ body {
     justify-content: flex-end;
 }
 
-.header .secondary-nav .search {
-    display: flex;
-}
-
-.header .secondary-nav .search svg {
+.header .secondary-nav svg {
     width: var(--icon-size);
 }
+
+.header .secondary-nav .search form {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.header .secondary-nav .search input {
+    position: absolute;
+    right: 0;
+    padding-block: 5px;
+    padding-left: 5px;
+    border-radius: 3px;
+    opacity: 0.9;
+    border: 0;
+    cursor: pointer;
+    border: 1px solid;
+}
+
+.header .secondary-nav .search button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.header .secondary-nav .search form:not(:focus-within) input {
+    width: 0;
+    padding-right: 25px;
+    z-index: 2;
+    background: transparent;
+    border-color: transparent;
+}
+
+.header .secondary-nav .search form:focus-within input {
+    width: unset;
+    padding-right: 50px;
+    z-index: 0;
+    background: var(--color-primary);
+    border-color: var(--color-secondary);
+}
+
+.header .secondary-nav .search form:not(:focus-within) .button-clean {
+    display: none;
+}
+
+.header .secondary-nav .search form:focus-within button svg {
+    padding: 3px;
+}
+
 
 .header .secondary-nav .theme {
     margin-left: 10px;
-}
-.header .secondary-nav .theme svg {
-    width: var(--icon-size);
 }
 
 .header .secondary-nav .theme[data-type="light"] .icon-moon,
@@ -379,6 +421,22 @@ body {
 .header .secondary-nav .theme[data-type="dark"] .icon-moon,
 .header .secondary-nav .theme[data-type="light"] .icon-sun {
     display: block;
+}
+
+@media screen and (min-width: 460px) {
+
+}
+@media screen and (max-width: 459px) {
+    .header .secondary-nav .search form:focus-within {
+        width: 95%;
+        position: absolute;
+        left: 0;
+        top: var(--header-min-height);
+        justify-content: flex-end;
+    }
+    .header .secondary-nav .search form:focus-within input {
+        width: 95%;
+    }
 }
 
 /*Main*/

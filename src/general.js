@@ -218,6 +218,17 @@ const API = {
             `${window.location.origin}/api/season?i=${id}&n=${n}`,
             option
         ).then(fetchResolve);
+    },
+    /**
+    @type {(
+        query: string,
+        page: string
+    ) => Promise<object>} */
+    getSearch(query, page = "1") {
+        return fetch(
+            `${window.location.origin}/api/search?q=${query}&p=${page}`,
+            option
+        ).then(fetchResolve)
     }
 };
 

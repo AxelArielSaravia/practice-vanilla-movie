@@ -52,7 +52,7 @@
         </a>
         <nav id="header_p_nav" class="primary-nav">
             <button class="nav-button" type="button">
-                Top Rated
+                Discover
             </button>
             <ul class="nav" data-mbshow="0">
                 <li class="nav-tab">
@@ -92,25 +92,45 @@
         </nav>
         <div class="secondary-nav">
             <div class="search">
-                <button
-                    id="header_button-search"
-                    type="button"
-                    arie-label="search button"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="icon icon-search"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                </button>
+                <form id="header_search">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Serach..."
+                        title="Search"
+                        required
+                    />
+                    <button type="button" class="button-clean" aria-label="clean search">
+                        <svg
+                            class="icon icon-x"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="button-search" aria-label="search button">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="icon icon-search"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
             <button id="header_button-theme" class="theme" data-type="dark">
                 <svg
