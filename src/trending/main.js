@@ -53,6 +53,7 @@ window.addEventListener("DOMContentLoaded", function () {
         templateModal: document.getElementById("template_modal"),
         //header
         headerPNav: document.getElementById("header_p_nav"),
+        headerSearch: document.getElementById("header_search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
         //main
         main: document.getElementById("main"),
@@ -72,6 +73,9 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     if (DOM.headerPNav === null) {
         throw Error("DOM.headerPNav is null");
+    }
+    if (DOM.headerSearch === null) {
+        throw Error("DOM.headerSearch is null");
     }
     if (DOM.headerButtonTheme === null) {
         throw Error("DOM.headerButtonTheme is null");
@@ -124,6 +128,10 @@ window.addEventListener("DOMContentLoaded", function () {
     DOM.headerPNav.firstElementChild.addEventListener("click", G.Nav.buttonNavOnclick);
     DOM.headerPNav.lastElementChild.addEventListener("focusout", G.Nav.navOnfocusout);
 
+    DOM.headerSearch.children[1].addEventListener("click", function (e) {
+        DOM.headerSearch.reset();
+    });
+
     DOM.buttonMore.addEventListener("click", function (e) {
         DOM.buttonMore?.setAttribute("data-display", "0");
         if (State.ended) {
@@ -174,16 +182,16 @@ window.addEventListener("DOMContentLoaded", function () {
         if (data?.results === undefined || data.results.length === 0) {
             State.ended = true;
             DOM.main.children[1].setAttribute("data-display", "1");
-            return;
-        }
-        var DOMItem;
-        for (var dataItem of data.results) {
-            DOMItem = G.Item.createDOMItem(
-                dataItem,
-                qmediaType,
-                DOM.templateItem?.content?.firstElementChild
-            );
-            State.fragment.appendChild(DOMItem);
+        } else {
+            var DOMItem;
+            for (var dataItem of data.results) {
+                DOMItem = G.Item.createDOMItem(
+                    dataItem,
+                    qmediaType,
+                    DOM.templateItem?.content?.firstElementChild
+                );
+                State.fragment.appendChild(DOMItem);
+            }
         }
         DocumentFragment.prototype.replaceChildren.apply(
             DOM.templateSkeleton.content,

@@ -3,12 +3,12 @@ import G from "../general.js";
 const State = {
     fragment: document.createDocumentFragment(),
     maxPages: 0,
-    page: 1,
+    page: 3,
     ended: false,
 };
 const DOMSkeletons = Array(6);
 
-async function addItems(dataPromise, qmediaType, DOM) {
+async function addItems(dataPromise, DOM) {
     var data;
     try {
         data = await dataPromise;
@@ -28,14 +28,18 @@ async function addItems(dataPromise, qmediaType, DOM) {
         );
         return;
     }
+    var mediaType = "";
     var DOMItem;
     for (var dataItem of data.results) {
-        DOMItem = G.Item.createDOMItem(
-            dataItem,
-            qmediaType,
-            DOM.templateItem?.content?.firstElementChild
-        );
-        State.fragment.appendChild(DOMItem);
+        mediaType = dataItem.media_type;
+        if (mediaType === "movie" || mediaType === "tv") {
+            DOMItem = G.Item.createDOMItem(
+                dataItem,
+                mediaType,
+                DOM.templateItem?.content?.firstElementChild
+            );
+            State.fragment.appendChild(DOMItem);
+        }
     }
     DocumentFragment.prototype.replaceChildren.apply(
         DOM.templateSkeleton.content,
@@ -94,11 +98,10 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     G.Route.url.href = window.location.href;
     var url = G.Route.url;
-    var qmediaType = url.searchParams.get(G.Route.Q_MEDIA_TYPE);
-    if (qmediaType === "tv") {
-        DOM.main.firstElementChild.textContent += " Tv Series";
-    } else if (qmediaType === "movie") {
-        DOM.main.firstElementChild.textContent += " Movies";
+    var qsearch = url.searchParams.get(G.Route.Q_SEARCH);
+
+    if (qsearch !== null) {
+        DOM.main.firstElementChild.textContent += ` ${qsearch}`;
     } else {
         throw Error("Bad Route");
     }
@@ -114,7 +117,8 @@ window.addEventListener("DOMContentLoaded", function () {
     G.Theme.init();
 
     //Route
-    G.Route.href = `${G.Route.href}?${G.Route.Q_MEDIA_TYPE}=${qmediaType}`;
+    G.Route.href = `${G.Route.href}?${G.Route.Q_SEARCH}=${qsearch}`;
+    G.Route.hrefq = `${G.Route.href}&`;
     G.Route.init(DOM);
 
     //Events
@@ -139,8 +143,7 @@ window.addEventListener("DOMContentLoaded", function () {
         }
         DOM.view.appendChild(DOM.templateSkeleton.content);
         addItems(
-            G.API.getPopular(qmediaType, String(State.page)),
-            qmediaType,
+            G.API.getSearch(qsearch, String(State.page)),
             DOM
         );
         State.page += 1;
@@ -151,10 +154,11 @@ window.addEventListener("DOMContentLoaded", function () {
         var type = target.getAttribute("data-type");
         if (type === G.TYPE.ITEM) {
             e.preventDefault();
+            var mediaType = target.getAttribute("data-media");
             var id = target.getAttribute("data-id");
             if (id !== null) {
                 G.Modal.open(
-                    /*mediaType*/   qmediaType,
+                    /*mediaType*/   mediaType,
                     /*id*/          id,
                     /*DOM*/         DOM,
                     /*changeRoute*/ true
@@ -172,24 +176,26 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     //Data
-    var popularPromise = G.API.getPopular(qmediaType, String(State.page));
-    State.page += 1;
-    var popularPromise2 = G.API.getPopular(qmediaType, String(State.page));
-    State.page += 1;
+    var searchPromise = G.API.getSearch(qsearch, "1");
+    var searchPromise2 = G.API.getSearch(qsearch, "2");
 
-    popularPromise.then(function (data) {
+    searchPromise.then(function (data) {
         if (data?.results === undefined || data.results.length === 0) {
             State.ended = true;
             DOM.main.children[1].setAttribute("data-display", "1");
         } else {
+            var mediaType = "";
             var DOMItem;
             for (var dataItem of data.results) {
-                DOMItem = G.Item.createDOMItem(
-                    dataItem,
-                    qmediaType,
-                    DOM.templateItem?.content?.firstElementChild
-                );
-                State.fragment.appendChild(DOMItem);
+                mediaType = dataItem.media_type;
+                if (mediaType === "movie" || mediaType === "tv") {
+                    DOMItem = G.Item.createDOMItem(
+                        dataItem,
+                        mediaType,
+                        DOM.templateItem?.content?.firstElementChild
+                    );
+                    State.fragment.appendChild(DOMItem);
+                }
             }
         }
         DocumentFragment.prototype.replaceChildren.apply(
@@ -197,24 +203,28 @@ window.addEventListener("DOMContentLoaded", function () {
             DOMSkeletons
         );
         DOM.view.appendChild(State.fragment);
-        popularPromise = null;
+        searchPromise = null;
     });
-    popularPromise2.then(function (data) {
+    searchPromise2.then(function (data) {
         if (data?.results === undefined || data.results.length === 0) {
             State.ended = true;
             return;
         }
+        var mediaType = "";
         var DOMItem;
         for (var dataItem of data.results) {
-            DOMItem = G.Item.createDOMItem(
-                dataItem,
-                qmediaType,
-                DOM.templateItem?.content?.firstElementChild
-            );
-            State.fragment.appendChild(DOMItem);
+            mediaType = dataItem.media_type;
+            if (mediaType === "movie" || mediaType === "tv") {
+                DOMItem = G.Item.createDOMItem(
+                    dataItem,
+                    mediaType,
+                    DOM.templateItem?.content?.firstElementChild
+                );
+                State.fragment.appendChild(DOMItem);
+            }
         }
         DOM.view.appendChild(State.fragment);
         DOM.buttonMore?.setAttribute("data-display", "1");
-        popularPromise2 = null;
+        searchPromise2 = null;
     });
 });

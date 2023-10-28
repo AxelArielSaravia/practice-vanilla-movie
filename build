@@ -46,6 +46,10 @@ if [ ! -d "$dir/trending" ]; then
     mkdir "$dir/trending"
     echo Create "$dir/trending"
 fi
+if [ ! -d "$dir/search" ]; then
+    mkdir "$dir/search"
+    echo Create "$dir/search"
+fi
 
 #Home
 minify -o $dir/index.html ./src/index.html --html-keep-end-tags
@@ -133,6 +137,14 @@ echo JS Build /trending/main.js Successful
 
 minify -o $dir/trending/index.html ./src/trending/index.html --html-keep-end-tags
 echo /trending/index.html minified success
+
+
+#Search
+bun build ./src/search/main.js --outdir $dir/search --minify --external '*'
+echo JS Build /search/main.js Successful
+
+minify -o $dir/search/index.html ./src/search/index.html --html-keep-end-tags
+echo /search/index.html minified success
 
 
 

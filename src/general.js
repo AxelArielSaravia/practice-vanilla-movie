@@ -226,9 +226,8 @@ const API = {
     ) => Promise<object>} */
     getSearch(query, page = "1") {
         return fetch(
-            `${window.location.origin}/api/search?q=${query}&p=${page}`,
-            option
-        ).then(fetchResolve)
+            `${window.location.origin}/api/search?q=${query}&p=${page}`
+        ).then(fetchResolve);
     }
 };
 
@@ -371,6 +370,7 @@ const Route = {
     Q_CAST: "ca",
     Q_COMPANY: "co",
     Q_ID: "i",
+    Q_SEARCH: "q",
 
     url: new URL(window.location.href),
     origin: `${window.location.origin}${window.location.pathname}`,

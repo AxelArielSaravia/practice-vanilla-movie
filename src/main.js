@@ -98,6 +98,7 @@ window.addEventListener("DOMContentLoaded", function () {
         templateModal: document.getElementById("template_modal"),
         //header
         headerPNav: document.getElementById("header_p_nav"),
+        headerSearch: document.getElementById("header_search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
         //main
         main: document.getElementById("main"),
@@ -117,6 +118,9 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     if (DOM.headerPNav === null) {
         throw Error("DOM.headerPNav is null");
+    }
+    if (DOM.headerSearch === null) {
+        throw Error("DOM.headerSearch is null");
     }
     if (DOM.headerButtonTheme === null) {
         throw Error("DOM.headerButtonTheme is null");
@@ -156,6 +160,10 @@ window.addEventListener("DOMContentLoaded", function () {
 
     DOM.headerPNav.firstElementChild.addEventListener("click", G.Nav.buttonNavOnclick);
     DOM.headerPNav.lastElementChild.addEventListener("focusout", G.Nav.navOnfocusout);
+
+    DOM.headerSearch.children[1].addEventListener("click", function (e) {
+        DOM.headerSearch.reset();
+    });
 
     DOM.view.addEventListener("click", function (e) {
         C.View.onclick(e.target, DOM, e);

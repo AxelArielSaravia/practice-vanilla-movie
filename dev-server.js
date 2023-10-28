@@ -10,7 +10,8 @@ import toprated from "./api/toprated.js";
 import movie    from "./api/movie.js";
 import tv       from "./api/tv.js";
 import credits  from "./api/credits.js";
-import season  from "./api/season.js";
+import season   from "./api/season.js";
+import search   from "./api/search.js";
 
 const PORT = Number(process.env.VANILLA_MOVIE_PORT);
 
@@ -41,24 +42,20 @@ function response404() {
 function staticResponse(req, reqPath) {
     if (reqPath === "/") {
         reqPath = "/index.html";
-    }
-    if (reqPath === "/movie") {
+    } else if (reqPath === "/movie") {
         reqPath = "/movie/index.html";
-    }
-    if (reqPath === "/tv") {
+    } else if (reqPath === "/tv") {
         reqPath = "/tv/index.html";
-    }
-    if (reqPath === "/discover") {
-        reqPath = "/discover/index.html"
-    }
-    if (reqPath === "/popular") {
-        reqPath = "/popular/index.html"
-    }
-    if (reqPath === "/top_rated") {
-        reqPath = "/top_rated/index.html"
-    }
-    if (reqPath === "/trending") {
-        reqPath = "/trending/index.html"
+    } else if (reqPath === "/discover") {
+        reqPath = "/discover/index.html";
+    } else if (reqPath === "/popular") {
+        reqPath = "/popular/index.html";
+    } else if (reqPath === "/top_rated") {
+        reqPath = "/top_rated/index.html";
+    } else if (reqPath === "/trending") {
+        reqPath = "/trending/index.html";
+    } else if (reqPath === "/search") {
+        reqPath = "/search/index.html";
     }
 
     let extension = path.extname(reqPath);
@@ -115,6 +112,8 @@ Bun.serve({
                 return credits(req);
             } else if (reqPath.endsWith("season")) {
                 return season(req);
+            } else if (reqPath.endsWith("search")) {
+                return search(req);
             }
             return ResponseBad;
         } else {

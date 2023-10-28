@@ -1,7 +1,7 @@
 
 import _utils from "./_utils.js";
 
-var SEARCH = "/search/keyword";
+var SEARCH = "/search/multi";
 export const config = {
     runtime: "edge",
 };
