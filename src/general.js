@@ -523,7 +523,6 @@ const Modal = {
     ) => Promise<undefined>} */
     async getCredit(mediaType, id, DOMModalData, DFModal) {
         var data = await API.getCredits(mediaType, id, FETCH_OPT);
-        console.info("credits:", data);
         if (data === undefined) {
             return;
         }
@@ -545,7 +544,6 @@ const Modal = {
             Modal.close(DOM);
             return;
         }
-        console.info("data:", data);
         if (data === undefined) {
             Modal.close(DOM);
             return;
@@ -618,7 +616,6 @@ const Modal = {
     ) => Promise<undefined>}*/
     async getSeason(id, n, DOMModalData, DFModal) {
         var data = await API.getSeason(id, n, FETCH_OPT);
-        console.info("season:", data);
         if (data === undefined) {
             return;
         }
@@ -634,7 +631,6 @@ const Modal = {
     ) => Promise<undefined>}*/
     async getSimilar(mediaType, id, DOMModalData, DFModal) {
         var data = await API.get(mediaType, id, true, FETCH_OPT);
-        console.info("similars:",data);
         if (data === undefined) {
             return;
         }

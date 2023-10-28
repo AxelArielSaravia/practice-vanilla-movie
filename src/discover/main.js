@@ -28,7 +28,6 @@ async function addItems(dataPromise, qmediaType, DOM) {
         );
         return;
     }
-    console.info(data);
     var DOMItem;
     for (var dataItem of data.results) {
         DOMItem = G.Item.createDOMItem(
@@ -113,7 +112,6 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     var promise1;
     var promise2;
-    console.info(qmediaType, qgenre, qcrew, qcast, qcompany);
     if (qgenre !== null) {
         promise1 = G.API.getDiscover(
             /*mediatype*/   qmediaType,
@@ -187,7 +185,8 @@ window.addEventListener("DOMContentLoaded", function () {
         );
         G.Route.hrefq = `${G.Route.href}?${G.Route.Q_TITLE}=${qtitle}&${G.Route.Q_COMPANY}=${qcompany}&`;
     } else {
-        throw Error("Bad Route");
+        window.open("./404.html", "_self", "noopener,noreferrer");
+        return;
     }
 
     DOMSkeletons[0] = DOM.view.children[0];
@@ -294,7 +293,6 @@ window.addEventListener("DOMContentLoaded", function () {
 
     //Data
     promise1.then(function (data) {
-        console.info(data);
         if (data?.results === undefined || data.results.length === 0) {
             State.ended = true;
             DOM.main.children[1].setAttribute("data-display", "1");
@@ -318,7 +316,6 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     promise2.then(function (data) {
-        console.info(data);
         if (data?.results === undefined || data.results.length === 0) {
             State.ended = true;
             return;

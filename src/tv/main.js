@@ -176,14 +176,7 @@ window.addEventListener("DOMContentLoaded", function () {
     var tvGenreList = G.API.getGenres("tv");
 
     var trendingPromise = G.API.getTrending("tv", "1");
-    trendingPromise.then(function (data) {
-        console.info("trending: ", data);
-    });
-
     var heroPromise = trendingPromise.then(G.Hero.selectHero);
-    heroPromise.then(function (data) {
-        console.info("hero: ", data);
-    });
 
     heroPromise.then(G.Hero.getHeroLogo).then(function (data) {
         G.Hero.initDOMImgLogo(data, DOM.hero);
@@ -213,7 +206,6 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     G.API.getPopular("tv", "1").then(function (data) {
-        console.info("getPopular tv", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getDiscover does not have data");
         }
@@ -231,7 +223,6 @@ window.addEventListener("DOMContentLoaded", function () {
     });
 
     G.API.getTopRated("tv", "1").then(function (data) {
-        console.info("getTopRate tv", data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }

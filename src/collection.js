@@ -119,7 +119,6 @@ const View = {
     ) => Promise<undefined>} */
     async discover(DataPromise, title, mediaType, genre, i, base, DOM) {
         var data = await DataPromise;
-        console.info(title, data);
         if (data?.results === undefined || data.results.length === 0) {
             throw Error("API.getTopRated does not have data");
         }
