@@ -103,7 +103,8 @@ window.addEventListener("DOMContentLoaded", function () {
     if (qsearch !== null) {
         DOM.main.firstElementChild.textContent += ` ${qsearch}`;
     } else {
-        throw Error("Bad Route");
+        window.open("./404.html", "_self", "noopener,noreferrer");
+        return;
     }
 
     DOMSkeletons[0] = DOM.view.children[0];

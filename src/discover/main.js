@@ -105,7 +105,8 @@ window.addEventListener("DOMContentLoaded", function () {
     var qcompany = url.searchParams.get(G.Route.Q_COMPANY);
 
     if (qmediaType === null) {
-        throw Error("Bad Route");
+        window.open("./404.html", "_self", "noopener,noreferrer");
+        return;
     }
     if (qtitle !== null) {
         DOM.main.firstElementChild.textContent = qtitle;

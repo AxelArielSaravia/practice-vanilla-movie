@@ -47,14 +47,10 @@ import G from "./general.js";
 window.addEventListener("DOMContentLoaded", function () {
     var DOM = {
         headerPNav: document.getElementById("header_p_nav"),
-        headerButtonSearch: document.getElementById("header_button-search"),
         headerButtonTheme: document.getElementById("header_button-theme"),
     };
     if (DOM.headerPNav === null) {
         throw Error("DOM.headerPNav is null");
-    }
-    if (DOM.headerButtonSearch === null) {
-        throw Error("DOM.headerButtonSearch is null");
     }
     if (DOM.headerButtonTheme === null) {
         throw Error("DOM.headerButtonTheme is null");

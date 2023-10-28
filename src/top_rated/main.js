@@ -100,7 +100,8 @@ window.addEventListener("DOMContentLoaded", function () {
     } else if (qmediaType === "movie") {
         DOM.main.firstElementChild.textContent += " Movies";
     } else {
-        throw Error("Bad Route");
+        window.open("./404.html", "_self", "noopener,noreferrer");
+        return;
     }
 
     DOMSkeletons[0] = DOM.view.children[0];
