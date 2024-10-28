@@ -445,9 +445,8 @@ const Item = {
             Route.getHref(mediaType, dataItem.id)
         );
         DOMItem.setAttribute("data-media", mediaType);
-        DOMItem.lastElementChild.insertAdjacentText("beforeend", title);
+        DOMItem.children["title"].insertAdjacentText("beforeend", title);
 
-        DOMItem.firstElementChild.setAttribute("alt", title);
         Item.setImage(
             API.getImages(dataItem.id, mediaType),
             DOMItem,
@@ -463,7 +462,7 @@ const Item = {
     ) => Promise<undefined>}*/
     async setImage(dataP, DOMItem, backdropAlt) {
         var data = await dataP;
-        var DOMImg = DOMItem.firstElementChild;
+        var DOMImg = DOMItem.lastElementChild;
         if (data === undefined
             || data.backdrops === undefined
             || data.backdrops.length === 0
@@ -474,7 +473,6 @@ const Item = {
                     `https://image.tmdb.org/t/p/w400${backdropAlt}`
                 );
                 DOMImg.setAttribute("data-display", "1");
-                DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
             }
         } else {
             var backdrop = data.backdrops[0];
@@ -484,7 +482,6 @@ const Item = {
                 `https://image.tmdb.org/t/p/w400${backdrop.file_path}`
             );
             DOMImg.setAttribute("data-display", "1");
-            DOMItem.lastElementChild?.setAttribute("data-opacity", "0");
         }
     },
 };
