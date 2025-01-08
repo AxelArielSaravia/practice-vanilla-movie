@@ -456,6 +456,7 @@ body {
 /*More*/
 .more[data-display="1"] {
     display: block;
+    font-family: var(--font-body);
     padding: 8px;
     border-radius: 3px;
     background: var(--color-loading);

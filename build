@@ -59,13 +59,13 @@ minify -o $dir/404.html ./src/404.html --html-keep-end-tags
 echo 404.html minified success
 
 
-bun build ./src/main.js --outdir $dir --minify --external '*'
+bun build ./src/main.js --outdir $dir --minify-whitespace --external '*'
 echo JS Build main.js Successful
 
-bun build ./src/general.js --outdir $dir --minify --external '*'
+bun build ./src/general.js --outdir $dir --minify-whitespace --external '*'
 echo JS Build general.js Successful
 
-bun build ./src/collection.js --outdir $dir --minify --external '*'
+bun build ./src/collection.js --outdir $dir --minify-whitespace --external '*'
 echo JS Build collection.js Successful
 
 
@@ -92,7 +92,7 @@ echo others.css minified success
 
 
 #Tv
-bun build ./src/tv/main.js --outdir $dir/tv --minify --external '*'
+bun build ./src/tv/main.js --outdir $dir/tv --minify-whitespace --external '*'
 echo JS Build /tv/main.js Successful
 
 minify -o $dir/tv/index.html ./src/tv/index.html --html-keep-end-tags
@@ -100,7 +100,7 @@ echo /tv/index.html minified success
 
 
 #Movie
-bun build ./src/movie/main.js --outdir $dir/movie --minify --external '*'
+bun build ./src/movie/main.js --outdir $dir/movie --minify-whitespace --external '*'
 echo JS Build /movie/main.js Successful
 
 minify -o $dir/movie/index.html ./src/movie/index.html --html-keep-end-tags
@@ -108,7 +108,7 @@ echo /movie/index.html minified success
 
 
 #Discover
-bun build ./src/discover/main.js --outdir $dir/discover --minify --external '*'
+bun build ./src/discover/main.js --outdir $dir/discover --minify-whitespace --external '*'
 echo JS Build /discover/main.js Successful
 
 minify -o $dir/discover/index.html ./src/discover/index.html --html-keep-end-tags
@@ -116,7 +116,7 @@ echo /discover/index.html minified success
 
 
 #Popular
-bun build ./src/popular/main.js --outdir $dir/popular --minify --external '*'
+bun build ./src/popular/main.js --outdir $dir/popular --minify-whitespace --external '*'
 echo JS Build /popular/main.js Successful
 
 minify -o $dir/popular/index.html ./src/popular/index.html --html-keep-end-tags
@@ -124,7 +124,7 @@ echo /popular/index.html minified success
 
 
 #Top Rated
-bun build ./src/top_rated/main.js --outdir $dir/top_rated --minify --external '*'
+bun build ./src/top_rated/main.js --outdir $dir/top_rated --minify-whitespace --external '*'
 echo JS Build /top_rated/main.js Successful
 
 minify -o $dir/top_rated/index.html ./src/top_rated/index.html --html-keep-end-tags
@@ -132,7 +132,7 @@ echo /top_rated/index.html minified success
 
 
 #Trending
-bun build ./src/trending/main.js --outdir $dir/trending --minify --external '*'
+bun build ./src/trending/main.js --outdir $dir/trending --minify-whitespace --external '*'
 echo JS Build /trending/main.js Successful
 
 minify -o $dir/trending/index.html ./src/trending/index.html --html-keep-end-tags
@@ -140,7 +140,7 @@ echo /trending/index.html minified success
 
 
 #Search
-bun build ./src/search/main.js --outdir $dir/search --minify --external '*'
+bun build ./src/search/main.js --outdir $dir/search --minify-whitespace --external '*'
 echo JS Build /search/main.js Successful
 
 minify -o $dir/search/index.html ./src/search/index.html --html-keep-end-tags
